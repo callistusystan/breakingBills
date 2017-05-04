@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:android.support.design="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#EEEEEE"
+    tools:context="edu.monash.fit3027.breakingbills.RoomActivity">
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/activity_room_tabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android.support.design:tabBackground="@color/colorPrimary"
+        android.support.design:tabIndicatorColor="@color/colorAccent"
+        android.support.design:tabTextColor="#FFF"
+        android.support.design:tabSelectedTextColor="#FFF"
+        android.support.design:tabPadding="0dp"
+        android.support.design:tabIndicatorHeight="3dp"
+        />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/activity_room_viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/activity_room_tabs" />
+
+</RelativeLayout>

@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "282755312633",
+    "firebase_url": "https://breaking-bills.firebaseio.com",
+    "project_id": "breaking-bills",
+    "storage_bucket": "breaking-bills.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:282755312633:android:713d81447a953be8",
+        "android_client_info": {
+          "package_name": "edu.monash.fit3027.breakingbills"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "282755312633-28hhj2ajv9m76r779u2telsf2f3626mc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaMVQAefJgNE97zvG_U_ab6Ew8YFrXncE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
