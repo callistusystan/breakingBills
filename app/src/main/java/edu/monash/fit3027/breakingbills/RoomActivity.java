@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -24,6 +25,7 @@ public class RoomActivity extends BaseActivity {
     // views
     private FragmentPagerAdapter pagerAdapter;
     private ViewPager viewPager;
+    private TextView roomIdTextView;
 
     // room
     private String roomUid;
@@ -61,6 +63,10 @@ public class RoomActivity extends BaseActivity {
     }
 
     public void initViews() {
+        // init roomId text view
+        roomIdTextView = (TextView) findViewById(R.id.activity_room_roomIdTextView);
+        roomIdTextView.setText("Room Id: " + roomUid);
+
         // Create the adapter that will return a fragment for each section
         pagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
             private final Fragment[] fragments = new Fragment[] {

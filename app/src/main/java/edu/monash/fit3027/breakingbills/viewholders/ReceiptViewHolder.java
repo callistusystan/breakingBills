@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
@@ -18,7 +19,7 @@ import edu.monash.fit3027.breakingbills.models.Receipt;
  * Created by Callistus on 3/5/2017.
  */
 
-public class ReceiptViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class ReceiptViewHolder extends RecyclerView.ViewHolder {
 
     public LinearLayout progressBar;
     public ImageView imageView;
@@ -28,8 +29,6 @@ public class ReceiptViewHolder extends RecyclerView.ViewHolder implements View.O
 
         progressBar = (LinearLayout) itemView.findViewById(R.id.item_receipt_loader);
         imageView = (ImageView) itemView.findViewById(R.id.item_receipt_imageView);
-
-        imageView.setOnClickListener(this);
     }
 
     public void bindToRoom(Receipt receipt, Context context) {
@@ -38,6 +37,7 @@ public class ReceiptViewHolder extends RecyclerView.ViewHolder implements View.O
         // Load the receipt using Glide
         Glide.with(context)
                 .load(receipt.uri)
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .fitCenter()
                 .dontAnimate()
                 .listener(new RequestListener<String, GlideDrawable>() {
@@ -56,11 +56,6 @@ public class ReceiptViewHolder extends RecyclerView.ViewHolder implements View.O
                     }
                 })
                 .into(imageView);
-    }
-
-    @Override
-    public void onClick(View v) {
-        System.out.println(imageView.getHeight());
     }
 }
 

@@ -2,9 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.monash.fit3027.breakingbills">
 
-    <uses-feature android:name="android.hardware.camera"
+    <uses-feature
+        android:name="android.hardware.camera"
         android:required="true" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
 
     <application
@@ -23,7 +26,12 @@
         </activity>
         <activity android:name=".BaseActivity" />
         <activity android:name=".CreateRoomActivity" />
-        <activity android:name=".RoomActivity"></activity>
+        <activity android:name=".RoomActivity" />
+        <activity
+            android:name=".PhotoActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_photo"
+            android:theme="@style/FullscreenTheme"></activity>
     </application>
 
 </manifest>

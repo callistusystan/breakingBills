@@ -1,13 +1,13 @@
 package edu.monash.fit3027.breakingbills;
 
+import android.content.Intent;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -18,6 +18,8 @@ import edu.monash.fit3027.breakingbills.models.Member;
 import edu.monash.fit3027.breakingbills.models.Room;
 
 public class CreateRoomActivity extends BaseActivity implements View.OnClickListener {
+
+    private static final int REQUEST_CONTACT = 100;
 
     // edit texts
     private EditText roomTitleEditText;
@@ -41,6 +43,16 @@ public class CreateRoomActivity extends BaseActivity implements View.OnClickList
         // set action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CONTACT) {
+            switch (RESULT_OK) {
+                case REQUEST_CONTACT:
+                    break;
+            }
+
+        }
     }
 
     @Override

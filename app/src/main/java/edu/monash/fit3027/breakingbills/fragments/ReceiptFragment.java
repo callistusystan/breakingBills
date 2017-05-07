@@ -32,7 +32,9 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
+import edu.monash.fit3027.breakingbills.PhotoActivity;
 import edu.monash.fit3027.breakingbills.R;
 import edu.monash.fit3027.breakingbills.RoomActivity;
 import edu.monash.fit3027.breakingbills.models.Receipt;
@@ -56,6 +58,9 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
     // button
     private FloatingActionButton cameraButton;
 
+    // arraylist of uris
+    private ArrayList<String> photoUris;
+
     public ReceiptFragment() {}
 
     @Override
@@ -73,6 +78,8 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
 
         cameraButton = (FloatingActionButton) rootView.findViewById(R.id.fragment_receipt_cameraButton);
         cameraButton.setOnClickListener(this);
+
+        photoUris = new ArrayList<>();
 
         return rootView;
     }
@@ -104,11 +111,11 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
     public void initReceiptsRecyclerView() {
         // Set up FirebaseRecyclerAdapter with the Query
         Query roomReceiptsQuery = getRoomReceiptsQuery();
-        FirebaseRecyclerAdapter<Receipt, ReceiptViewHolder> recyclerAdapter =
+        final FirebaseRecyclerAdapter<Receipt, ReceiptViewHolder> recyclerAdapter =
                 new FirebaseRecyclerAdapter<Receipt, ReceiptViewHolder>
                         (Receipt.class, R.layout.item_receipt, ReceiptViewHolder.class, roomReceiptsQuery) {
                     @Override
-                    protected void populateViewHolder(ReceiptViewHolder viewHolder, final Receipt model, int position) {
+                    protected void populateViewHolder(ReceiptViewHolder viewHolder, final Receipt model, final int position) {
                         getRoomActivity().hideProgressDialog();
                         final DatabaseReference receiptRef = getRef(position);
 
@@ -117,13 +124,16 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
                                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                // Launch RoomActivity on this room
-//                                Intent intent = new Intent(MainActivity.this, RoomActivity.class);
-//
-//                                intent.putExtra("roomUid", roomUid);
-//                                intent.putExtra("roomTitle", model.title);
-//
-//                                startActivity(intent);
+
+                                Intent intent = new Intent(getActivity(), PhotoActivity.class);
+
+                                System.out.println("BEFORE LEAVING");
+                                System.out.println(photoUris);
+
+                                intent.putStringArrayListExtra("photoUris", photoUris);
+                                intent.putExtra("position", position);
+
+                                startActivity(intent);
                             }
                         });
 
@@ -142,7 +152,15 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
         roomReceiptsQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                System.out.println(getRoomActivity());
+                photoUris.clear();
+
+                // iterate through every receipt
+                for (DataSnapshot receiptDataSnapshot : dataSnapshot.getChildren()) {
+                    Receipt receipt = receiptDataSnapshot.getValue(Receipt.class);
+
+                    photoUris.add(receipt.uri);
+                }
+
                 instance.getRoomActivity().hideProgressDialog();
                 if (dataSnapshot.getValue() == null) {
                     receiptsRecylerView.setVisibility(View.GONE);

@@ -27,14 +27,15 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import edu.monash.fit3027.breakingbills.models.Member;
 import edu.monash.fit3027.breakingbills.models.Room;
 import edu.monash.fit3027.breakingbills.viewholders.RoomViewHolder;
+
+import static edu.monash.fit3027.breakingbills.Utils.getMonthYear;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -59,8 +60,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     // recyclerAdapter
     FirebaseRecyclerAdapter<Room, RoomViewHolder> recyclerAdapter;
 
-    // hash set to see if section has appeared
-    private HashMap<String, Long> sectionTimestamp;
+    // hashmaps for setting section headers
+    private HashMap<String, String> sectionStartsAtRoomUid;
+    private HashMap<String, RoomViewHolder> roomUidRoomViewHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +73,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         auth = FirebaseAuth.getInstance();
         databaseRef = FirebaseDatabase.getInstance().getReference();
 
-        // init hashset
-        sectionTimestamp = new HashMap<>();
+        // init hash maps
+        sectionStartsAtRoomUid = new HashMap<>();
+        roomUidRoomViewHolder = new HashMap<>();
 
         // init views
         initViews();
@@ -128,6 +131,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // check if we returned from the Create Room Screen
+        if (requestCode == CREATE_ROOM_REQ) {
+            if (resultCode == RESULT_OK) {
+                // show a snackbar that a room has been successfully created
+                showSnackbar(findViewById(R.id.activity_main_layout), "Room created!");
+            }
+        }
+    }
+
     public void signIn() {
         // simply sign in anonymously
         auth.signInAnonymously()
@@ -141,7 +157,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         initRoomsRecyclerView();
                     } else {
                         // If sign in fails, display a message to the user.
-                        System.out.println("sign in fail");
                         showSnackbar(findViewById(R.id.activity_main_layout), "Sign in failed");
                     }
                 }
@@ -176,69 +191,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 // get monthyear for the current timestamp
                 String monthYear = getMonthYear(model.timestamp);
 
-                // set up the UI elements
-                // also, if the room's timestamp is the most recent for that month year, show the section header
-                if (sectionTimestamp.get(monthYear) == model.timestamp)
-                    viewHolder.bindToRoom(model, getCurrentUserUid(), monthYear);
-                else
-                    viewHolder.bindToRoom(model, getCurrentUserUid(), "");
+                viewHolder.bindToRoom(model, getCurrentUserUid());
+                if (sectionStartsAtRoomUid.get(monthYear) == roomUid) {
+                    viewHolder.showSectionHeader();
+                } else {
+                    viewHolder.hideSectioHeader();
+                }
+                roomUidRoomViewHolder.put(roomUid, viewHolder);
             }
         };
         roomsRecyclerView.setAdapter(recyclerAdapter);
-    }
-
-    public Query getJoinedRoomsQuery() {
-        Query joinedRoomsQuery = databaseRef.child("rooms").orderByChild("members/"+getCurrentUserUid()).equalTo(true)
-            .limitToLast(100);
-
-        joinedRoomsQuery.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                hideProgressDialog();
-                Map<String, Map<String, Object>> newJoinedRooms = (Map<String, Map<String, Object>>)dataSnapshot.getValue();
-                determineRoomToHaveSectionHeader(newJoinedRooms);
-
-                if (dataSnapshot.getValue() == null) {
-                    roomsRecyclerView.setVisibility(View.GONE);
-                    emptyMessageLinearLayout.setVisibility(View.VISIBLE);
-                } else {
-                    roomsRecyclerView.setVisibility(View.VISIBLE);
-                    emptyMessageLinearLayout.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                hideProgressDialog();
-            }
-        });
-
-        return joinedRoomsQuery;
-    }
-
-    public void determineRoomToHaveSectionHeader(Map<String, Map<String, Object>> newJoinedRooms) {
-        sectionTimestamp.clear();
-        for (String roomUid: newJoinedRooms.keySet()) {
-            // get timestamp of current room
-            long timestamp = Long.parseLong(newJoinedRooms.get(roomUid).get("timestamp").toString());
-
-            // get monthyear of timestamp
-            String monthYear = getMonthYear(timestamp);
-
-            // set monthyear to contain the most recent timestamp
-            if (!sectionTimestamp.containsKey(monthYear))
-                sectionTimestamp.put(monthYear, timestamp);
-
-            sectionTimestamp.put(monthYear, Math.max(sectionTimestamp.get(monthYear), timestamp));
-        }
-    }
-
-    public String getMonthYear(long timestamp) {
-        Date date = new Date(timestamp);
-        SimpleDateFormat sfd = new SimpleDateFormat("MMMMMM yyyy");
-        String monthYear = sfd.format(date);
-
-        return monthYear;
     }
 
     @Override
@@ -298,21 +260,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         bottomSheetDialog.hide();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // check if we returned from the Create Room Screen
-        if (requestCode == CREATE_ROOM_REQ) {
-            if (resultCode == RESULT_OK) {
-                // show a snackbar that a room has been successfully created
-                showSnackbar(findViewById(R.id.activity_main_layout), "Room created!");
-            }
-        } else {
-            System.out.println("RETURNED TO MAINACTIVITY FROM ANOTHER ROOM");
-        }
-    }
-
     private void joinRoom(final String roomId, final String nickname) {
         // check if room exists
         databaseRef.child("rooms").child(roomId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -348,6 +295,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
                 // update db
                 databaseRef.updateChildren(childUpdates);
+
                 showSnackbar(findViewById(R.id.activity_main_layout), "Joined room!");
             }
 
@@ -356,5 +304,82 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
             }
         });
+    }
+
+    public Query getJoinedRoomsQuery() {
+        Query joinedRoomsQuery = databaseRef.child("rooms").orderByChild("members/"+getCurrentUserUid()).equalTo(true)
+                .limitToLast(100);
+
+        joinedRoomsQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                hideProgressDialog();
+
+                if (dataSnapshot.getValue() == null) {
+                    roomsRecyclerView.setVisibility(View.GONE);
+                    emptyMessageLinearLayout.setVisibility(View.VISIBLE);
+                } else {
+                    roomsRecyclerView.setVisibility(View.VISIBLE);
+                    emptyMessageLinearLayout.setVisibility(View.GONE);
+
+                    // determine sections that should show section header
+                    determineSections(dataSnapshot);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                hideProgressDialog();
+            }
+        });
+
+        return joinedRoomsQuery;
+    }
+
+    public void determineSections(DataSnapshot dataSnapshot) {
+        // clear the section-roomUid map
+        sectionStartsAtRoomUid.clear();
+        HashMap<String, Long> sectionTimeStamp = new HashMap<>();
+
+        // iterate through every room
+        for (DataSnapshot roomDataSnapshot : dataSnapshot.getChildren()) {
+            Room room = roomDataSnapshot.getValue(Room.class);
+
+            // convert room's timestamp into month year
+            String monthYear = getMonthYear(room.timestamp);
+            if (!sectionTimeStamp.containsKey(monthYear))
+                sectionTimeStamp.put(monthYear, room.timestamp);
+            sectionTimeStamp.put(monthYear, Math.max(room.timestamp, sectionTimeStamp.get(monthYear)));
+        }
+
+        // now set sectionStartsAtRoomUid and show/hide section headers
+        for (DataSnapshot roomDataSnapshot : dataSnapshot.getChildren()) {
+            String roomUid = roomDataSnapshot.getKey();
+            Room room = roomDataSnapshot.getValue(Room.class);
+
+            // convert room's timestamp into month year
+            String monthYear = getMonthYear(room.timestamp);
+            sectionTimeStamp.put(monthYear, Math.max(room.timestamp, sectionTimeStamp.get(monthYear)));
+
+            // if this is the most recent timestamp of the section, set it in hash map
+            if (room.timestamp == sectionTimeStamp.get(monthYear)) {
+                // put this roomUid in the map for monthYear
+                sectionStartsAtRoomUid.put(monthYear, roomUid);
+
+                // if viewholder for this room has already been made, simply show section header
+                if (roomUidRoomViewHolder.containsKey(roomUid)) {
+                    roomUidRoomViewHolder.get(roomUid).showSectionHeader();
+                } // else do nothing, because when it is made, it will show the header
+            } else {
+                // this means this roomUid is not the most recent of the section
+                // if this viewholder has already been made, hide the section header
+                if (roomUidRoomViewHolder.containsKey(roomUid)) {
+                    roomUidRoomViewHolder.get(roomUid).hideSectioHeader();
+                }
+            }
+
+        }
+
+
     }
 }

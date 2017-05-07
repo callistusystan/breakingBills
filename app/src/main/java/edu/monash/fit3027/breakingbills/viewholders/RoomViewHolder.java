@@ -30,6 +30,8 @@ public class RoomViewHolder extends RecyclerView.ViewHolder {
     public TextView statusTextView;
     public ImageView iconImageView;
 
+    public long timestamp;
+
     public RoomViewHolder(View itemView) {
         super(itemView);
 
@@ -40,18 +42,20 @@ public class RoomViewHolder extends RecyclerView.ViewHolder {
         iconImageView = (ImageView) itemView.findViewById(R.id.item_room_roomIcon);
     }
 
-    public void bindToRoom(Room room, String currentUserUid, String sectionTitle) {
-        if (!sectionTitle.equals("")) {
-            sectionTextView.setText(sectionTitle);
-            sectionTextView.setVisibility(View.VISIBLE);
-        }
+    public void bindToRoom(Room room, String currentUserUid) {
+        // set timestamp
+        timestamp = room.timestamp;
+
+        // set sectionTextView
+        Date date = new Date(room.timestamp);
+        SimpleDateFormat sfd = new SimpleDateFormat("MMMM yyyy");
+        sectionTextView.setText(sfd.format(date));
 
         // set room title
         titleTextView.setText(room.title);
 
         // set room date
-        Date date = new Date(room.timestamp);
-        SimpleDateFormat sfd = new SimpleDateFormat("d MMM");
+        sfd = new SimpleDateFormat("d MMM");
         dateTextView.setText(sfd.format(date));
 
         // set status and icon
@@ -71,6 +75,10 @@ public class RoomViewHolder extends RecyclerView.ViewHolder {
                 iconImageView.setBackgroundTintList(ColorStateList.valueOf(RED));
                 break;
         }
+    }
+
+    public void showSectionHeader() {
+        this.sectionTextView.setVisibility(View.VISIBLE);
     }
 
     public void hideSectioHeader() {
