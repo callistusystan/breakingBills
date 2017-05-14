@@ -5,12 +5,15 @@ package edu.monash.fit3027.breakingbills.fragments;
  */
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DataSnapshot;
@@ -20,6 +23,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import edu.monash.fit3027.breakingbills.BaseActivity;
 import edu.monash.fit3027.breakingbills.R;
 import edu.monash.fit3027.breakingbills.RoomActivity;
 import edu.monash.fit3027.breakingbills.models.Member;
@@ -99,7 +106,41 @@ public class PeopleFragment extends RoomFragment {
                     viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            System.out.println("Clicked " + memberUid);
+//                            // init the alert dialog builder
+//                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//
+//                            // set the layout for the alert dialog
+//                            LayoutInflater inflater = getActivity().getLayoutInflater();
+//                            final View setPaymentDialogView = inflater.inflate(R.layout.set_payment_dialog, null);
+//
+//                            // set the positive and negative buttons' onclicks
+//                            builder.setView(setPaymentDialogView)
+//                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(DialogInterface dialog, int which) {
+//                                            // init edit texts
+//                                            EditText set_payment_dialog_amountEditText = (EditText) setPaymentDialogView.findViewById(R.id.set_payment_dialog_amountEditText);
+//
+//                                            String amount = set_payment_dialog_amountEditText.getText().toString().trim();
+//
+//                                            // only process if both fields are not empty
+//                                            if (isValidCurrency(amount)){
+//                                                setAmount(memberUid, amount);
+//                                            } else {
+//                                                // if any is empty, show a error snackbar
+//                                                getRoomActivity().showSnackbar(getRoomActivity().findViewById(R.id.activity_room_viewPager), "You must enter both fields!");
+//                                            }
+//                                        }
+//                                    })
+//                                    .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(DialogInterface dialog, int which) {
+//                                        }
+//                                    });
+//
+//                            // create and show this dialog
+//                            AlertDialog alertDialog = builder.create();
+//                            alertDialog.show();
                         }
                     });
 
@@ -108,6 +149,20 @@ public class PeopleFragment extends RoomFragment {
                 }
             };
         membersRecyclerView.setAdapter(recyclerAdapter);
+    }
+
+    public boolean isValidCurrency(String amount) {
+        return true;
+    }
+
+    public void setAmount(String memberUid, String amount) {
+        DatabaseReference ref = databaseRef.child("rooms/"+getRoomActivity().getRoomUid()+"/memberDetail/"+memberUid);
+        long amountLong = Long.parseLong(amount);
+        Map<String, Object> myMap = new HashMap<>();
+        myMap.put("amount", Long.parseLong(amount));
+        myMap.put("status", "Owes " + String.format("$%d.%02d", amountLong/100, amountLong%100));
+
+        ref.setValue(myMap);
     }
 
     public Query getMembersQuery() {
