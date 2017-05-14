@@ -138,7 +138,7 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
                         });
 
                         // set up the UI elements
-                        viewHolder.bindToRoom(model, getContext());
+                        viewHolder.bindToRoom(getRoomActivity().getRoomUid(), receiptUid, getContext());
                     }
                 };
         receiptsRecylerView.setAdapter(recyclerAdapter);

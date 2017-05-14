@@ -11,6 +11,11 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import edu.monash.fit3027.breakingbills.R;
 import edu.monash.fit3027.breakingbills.models.Receipt;
@@ -31,25 +36,28 @@ public class ReceiptViewHolder extends RecyclerView.ViewHolder {
         imageView = (ImageView) itemView.findViewById(R.id.item_receipt_imageView);
     }
 
-    public void bindToRoom(Receipt receipt, Context context) {
+    public void bindToRoom(String roomUid, String receiptUid, Context context) {
         // receipt view
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference()
+                .child("rooms/"+roomUid+"/receipts/"+receiptUid+".jpg");
 
         // Load the receipt using Glide
         Glide.with(context)
-                .load(receipt.uri)
+                .using(new FirebaseImageLoader())
+                .load(storageReference)
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .fitCenter()
                 .dontAnimate()
-                .listener(new RequestListener<String, GlideDrawable>() {
+                .listener(new RequestListener<StorageReference, GlideDrawable>() {
                     @Override
-                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                    public boolean onException(Exception e, StorageReference model, Target<GlideDrawable> target, boolean isFirstResource) {
                         System.out.println("FAILED LOADING");
                         progressBar.setVisibility(View.GONE);
                         return false;
                     }
 
                     @Override
-                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                    public boolean onResourceReady(GlideDrawable resource, StorageReference model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
                         System.out.println("DONE LOADING");
                         progressBar.setVisibility(View.GONE);
                         return false;
