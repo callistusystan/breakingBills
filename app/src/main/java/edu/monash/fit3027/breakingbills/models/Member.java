@@ -14,29 +14,27 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class Member {
 
-    public final static String NO_STATUS = "No status.";
-    public final static String PAYMENT_SETTLED = "Payment settled.";
-    public final static String PAID_CHANGE = "Paid, but expecting change.";
-    public final static String PAID_CONFIRM = "Paid, but waiting for confirmation.";
-    public final static String EXPECTING_PAYMENT = "Expecting payment.";
+    public final static String NO_STATUS = "No status";
+    public final static String PAYMENT_SETTLED = "Payment settled";
+    public final static String PAID_CHANGE = "Paid, but expecting change";
+    public final static String PAID_CONFIRM = "Paid, but waiting for confirmation";
+    public final static String EXPECTING_PAYMENT = "Expecting payment";
 
     public String nickname;
     public boolean isHost;
-    public boolean hasPaid;
     public String status;
+    public Map<String, Boolean> pendingPayments;
     public long timestamp;
-    public int amount;
+    public long cost = 0;
+    public long amountPaid = 0;
 
     public Member() {
     }
 
-    public Member(String nickname, boolean isHost, boolean hasPaid, String status, long timestamp, int amount) {
+    public Member(String nickname, boolean isHost, String status) {
         this.nickname = nickname;
         this.isHost = isHost;
-        this.hasPaid = hasPaid;
         this.status = status;
-        this.timestamp = timestamp;
-        this.amount = amount;
     }
 
     @Exclude
@@ -44,10 +42,11 @@ public class Member {
         HashMap<String, Object> result = new HashMap<>();
         result.put("nickname", nickname);
         result.put("isHost", isHost);
-        result.put("hasPaid", hasPaid);
+        result.put("pendingPayments", pendingPayments);
         result.put("status", status);
         result.put("timestamp", ServerValue.TIMESTAMP);
-        result.put("amount", -1);
+        result.put("cost", cost);
+        result.put("amountPaid", amountPaid);
 
         return result;
     }

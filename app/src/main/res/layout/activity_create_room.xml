@@ -35,6 +35,24 @@
             android:layout_marginTop="16dp">
 
             <EditText
+                android:id="@+id/activity_create_room_totalAmountEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:textSize="24dp"
+                android:hint="Total cost"
+                android:inputType="numberDecimal"
+                android:maxLength="15"
+                android:maxLines="1" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp">
+
+            <EditText
                 android:id="@+id/activity_create_room_nicknameEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

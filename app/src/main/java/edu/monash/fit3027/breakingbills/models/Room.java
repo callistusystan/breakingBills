@@ -16,17 +16,19 @@ public class Room {
     public String title;
     public String hostUid;
     public long timestamp;
-    public Map<String, Boolean> members = new HashMap<>();
+    public long totalAmount;
+    public Map<String, Object> members = new HashMap<>();
     public Map<String, Map<String, Object>> memberDetail = new HashMap<>();
-    public Map<String, Object> receipts = new HashMap<>();
+    public Map<String, Map<String, Object>> receipts = new HashMap<>();
+    public Map<String, Map<String, Object>> payments = new HashMap<>();
 
     public Room() {
     }
 
-    public Room(String title, String hostUid, long timestamp) {
+    public Room(String title, String hostUid, long totalAmount) {
         this.title = title;
         this.hostUid = hostUid;
-        this.timestamp = timestamp;
+        this.totalAmount = totalAmount;
     }
 
     @Exclude
@@ -34,10 +36,12 @@ public class Room {
         HashMap<String, Object> result = new HashMap<>();
         result.put("title", title);
         result.put("hostUid", hostUid);
+        result.put("totalAmount", totalAmount);
         result.put("timestamp", ServerValue.TIMESTAMP);
         result.put("members", members);
         result.put("memberDetail", memberDetail);
         result.put("receipts", receipts);
+        result.put("payments", payments);
 
         return result;
     }

@@ -5,13 +5,35 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/fragment_all_people_recyclerView"
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/fragment_all_people_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:clipToPadding="false"
-        android:scrollbars="vertical"
-        tools:listitem="@layout/item_member" />
+        android:background="#F5F5F5"
+        tools:context="edu.monash.fit3027.breakingbills.MainActivity">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/fragment_all_people_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            tools:listitem="@layout/item_member" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fragment_all_people_addButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone"
+            android:src="@drawable/ic_add"
+            android:tint="#FFF" />
+
+    </android.support.design.widget.CoordinatorLayout>
 
 </FrameLayout>

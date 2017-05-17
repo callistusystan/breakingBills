@@ -11,8 +11,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -28,18 +30,21 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import edu.monash.fit3027.breakingbills.models.Member;
 import edu.monash.fit3027.breakingbills.models.Room;
+import edu.monash.fit3027.breakingbills.models.User;
+import edu.monash.fit3027.breakingbills.viewholders.MemberViewHolder;
 import edu.monash.fit3027.breakingbills.viewholders.RoomViewHolder;
 
+import static edu.monash.fit3027.breakingbills.Utils.convertLongToStringCurrency;
 import static edu.monash.fit3027.breakingbills.Utils.getMonthYear;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     public static final int CREATE_ROOM_REQ = 100;
+    public static final int ENTER_ROOM_REQ = 200;
 
     // firebase components
     private FirebaseAuth auth;
@@ -51,6 +56,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private LinearLayoutManager roomsRecyclerViewManager;
     private BottomSheetDialog bottomSheetDialog;
     private LinearLayout emptyMessageLinearLayout;
+    private TextView oweTextView;
+    private TextView isOwedTextView;
+    private TextView balanceTextView;
 
     // buttons
     private FloatingActionButton addButton;
@@ -83,7 +91,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     public void initViews() {
         // Set up Layout Manager, reverse layout so it shows most recent at the top
-        roomsRecyclerViewManager = new LinearLayoutManager(this);
+        roomsRecyclerViewManager = new LinearLayoutManager(this) {
+            @Override
+            public boolean supportsPredictiveItemAnimations() {
+                return false;
+            }
+        };
         roomsRecyclerViewManager.setReverseLayout(true);
         roomsRecyclerViewManager.setStackFromEnd(true);
 
@@ -94,6 +107,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         // init text view
         emptyMessageLinearLayout = (LinearLayout) findViewById(R.id.activity_main_emptyView);
+        oweTextView = (TextView) findViewById(R.id.activity_main_oweTextView);
+        isOwedTextView = (TextView) findViewById(R.id.activity_main_isOwedTextView);
+        balanceTextView = (TextView) findViewById(R.id.activity_main_balanceTextView);
 
         // init add floating action button
         addButton = (FloatingActionButton) findViewById(R.id.activity_main_addButton);
@@ -127,7 +143,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             signIn();
         } else {
             // user has signed in, so init rooms
-            initRoomsRecyclerView();
+            loadFirebaseData();
         }
     }
 
@@ -140,6 +156,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             if (resultCode == RESULT_OK) {
                 // show a snackbar that a room has been successfully created
                 showSnackbar(findViewById(R.id.activity_main_layout), "Room created!");
+            }
+        } else if (requestCode == ENTER_ROOM_REQ) {
+            if (resultCode == RESULT_OK) {
+                // show a snackbar that user has left room
+                showSnackbar(findViewById(R.id.activity_main_layout), "Left room!");
             }
         }
     }
@@ -154,13 +175,48 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         currentUser = auth.getCurrentUser();
-                        initRoomsRecyclerView();
+
+                        // Also, create a store in database to keep track of owed amounts
+                        User user = new User(0,0);
+                        databaseRef.child("users/" + getCurrentUserUid()).setValue(user.toMap());
+
+                        loadFirebaseData();
                     } else {
                         // If sign in fails, display a message to the user.
                         showSnackbar(findViewById(R.id.activity_main_layout), "Sign in failed");
                     }
                 }
             });
+    }
+
+    public void loadFirebaseData() {
+        Query userQuery = databaseRef.child("users/"+getCurrentUserUid());
+
+        userQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+
+                oweTextView.setText(convertLongToStringCurrency(user.owe));
+                isOwedTextView.setText(convertLongToStringCurrency(user.isOwed));
+                if (user.isOwed > user.owe) {
+                    balanceTextView.setText("+" + convertLongToStringCurrency(user.isOwed - user.owe));
+                    balanceTextView.setTextColor(MemberViewHolder.GREEN);
+                } else if (user.isOwed == user.owe) {
+                    balanceTextView.setText("+-"+ convertLongToStringCurrency(0));
+                    balanceTextView.setTextColor(MemberViewHolder.GREEN);
+                } else {
+                    balanceTextView.setText("-"+ convertLongToStringCurrency(user.isOwed-user.owe));
+                    balanceTextView.setTextColor(MemberViewHolder.RED);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+
+        initRoomsRecyclerView();
     }
 
     public void initRoomsRecyclerView() {
@@ -171,6 +227,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         (Room.class, R.layout.item_room, RoomViewHolder.class, joinedRoomsQuery) {
             @Override
             protected void populateViewHolder(RoomViewHolder viewHolder, final Room model, int position) {
+                if (!model.members.containsKey(getCurrentUserUid())) {
+                    viewHolder.itemView.setVisibility(View.INVISIBLE);
+                    return;
+                }
                 final DatabaseReference roomRef = getRef(position);
 
                 // Set click listener for the whole room view
@@ -184,7 +244,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         intent.putExtra("roomUid", roomUid);
                         intent.putExtra("roomTitle", model.title);
 
-                        startActivity(intent);
+                        startActivityForResult(intent, ENTER_ROOM_REQ);
                     }
                 });
 
@@ -229,20 +289,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 .setPositiveButton("JOIN", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // init edit texts
-                        EditText join_room_dialog_roomIdEditText = (EditText) joinRoomDialogView.findViewById(R.id.join_room_dialog_roomIdEditText);
-                        EditText join_room_dialog_nicknameEditText = (EditText) joinRoomDialogView.findViewById(R.id.join_room_dialog_nicknameEditText);
 
-                        String roomId = join_room_dialog_roomIdEditText.getText().toString().trim();
-                        String nickname = join_room_dialog_nicknameEditText.getText().toString().trim();
-
-                        // only process if both fields are not empty
-                        if (!roomId.equals("") && !nickname.equals("")){
-                            joinRoom(roomId, nickname);
-                        } else {
-                            // if any is empty, show a error snackbar
-                            showSnackbar(findViewById(R.id.activity_main_layout), "You must enter both fields!");
-                        }
                     }
                 })
                 .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -253,6 +300,93 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
             // create and show this dialog
             AlertDialog alertDialog = builder.create();
+
+            alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                @Override
+                public void onShow(final DialogInterface dialog) {
+                    // init edit texts
+                    Button button = ((AlertDialog)dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+
+                    button.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // init edit texts
+                            final EditText join_room_dialog_roomIdEditText = (EditText) joinRoomDialogView.findViewById(R.id.join_room_dialog_roomIdEditText);
+                            final EditText join_room_dialog_nicknameEditText = (EditText) joinRoomDialogView.findViewById(R.id.join_room_dialog_nicknameEditText);
+
+                            final String roomId = join_room_dialog_roomIdEditText.getText().toString().trim();
+                            final String nickname = join_room_dialog_nicknameEditText.getText().toString().trim();
+
+                            // only process if both fields are not empty
+                            if (!roomId.equals("") && !nickname.equals("")){
+                                // check if room exists
+                                databaseRef.child("rooms").child(roomId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        // do not continue if room does not exist
+                                        if (dataSnapshot.getValue() == null) {
+                                            join_room_dialog_roomIdEditText.setError("Room does not exist!");
+                                            return;
+                                        }
+
+                                        // do not continue if already a member
+                                        Room roomToUpdate = dataSnapshot.getValue(Room.class);
+
+                                        if (roomToUpdate.members.containsKey(getCurrentUserUid())) {
+                                            join_room_dialog_roomIdEditText.setError("You are already in this room!");
+                                            return;
+                                        }
+
+                                        for (String memberUid: roomToUpdate.memberDetail.keySet()) {
+                                            String memberNickName = (String) roomToUpdate.memberDetail.get(memberUid).get("nickname");
+                                            if (memberNickName.equals(nickname)) {
+                                                join_room_dialog_nicknameEditText.setError("Nickname is already used! ");
+                                                return;
+                                            }
+                                        }
+
+                                        if (roomToUpdate.members.containsKey(getCurrentUserUid())) {
+                                            join_room_dialog_roomIdEditText.setError("You are already in this room!");
+                                            return;
+                                        }
+
+                                        // since room exists and not a member, thus join the room
+
+                                        // indicate in room that current user is now a member
+                                        roomToUpdate.members.put(getCurrentUserUid(), roomToUpdate.timestamp+1);
+
+                                        // init the member
+                                        Member member = new Member(nickname, false, Member.NO_STATUS);
+                                        roomToUpdate.memberDetail.put(getCurrentUserUid(), member.toMap());
+
+                                        // specify locations in db to update
+                                        Map<String, Object> childUpdates = new HashMap<>();
+                                        childUpdates.put("/rooms/" + roomId + "/memberDetail", roomToUpdate.memberDetail);
+                                        childUpdates.put("/rooms/" + roomId + "/members/" + getCurrentUserUid(), roomToUpdate.timestamp+1);
+
+                                        // update db
+                                        databaseRef.updateChildren(childUpdates);
+
+
+                                        ((AlertDialog) dialog).hide();
+                                        showSnackbar(findViewById(R.id.activity_main_layout), "Joined room!");
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+                            } else {
+                                if (roomId.equals(""))
+                                    join_room_dialog_roomIdEditText.setError("You must enter this field!");
+                                if (nickname.equals(""))
+                                    join_room_dialog_nicknameEditText.setError("You must enter this field!");
+                            }
+                        }
+                    });
+                }
+            });
             alertDialog.show();
         }
 
@@ -260,54 +394,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         bottomSheetDialog.hide();
     }
 
-    private void joinRoom(final String roomId, final String nickname) {
-        // check if room exists
-        databaseRef.child("rooms").child(roomId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // do not continue if room does not exist
-                if (dataSnapshot.getValue() == null) {
-                    showSnackbar(findViewById(R.id.activity_main_layout), "Room does not exist!");
-                    return;
-                }
-
-                // do not continue if already a member
-                Room roomToUpdate = dataSnapshot.getValue(Room.class);
-
-                if (roomToUpdate.members.containsKey(getCurrentUserUid())) {
-                    showSnackbar(findViewById(R.id.activity_main_layout), "You are already in this room!");
-                    return;
-                }
-
-                // since room exists and not a member, thus join the room
-
-                // indicate in room that current user is now a member
-                roomToUpdate.members.put(getCurrentUserUid(), true);
-
-                // init the member
-                Member member = new Member(nickname, false, false, Member.NO_STATUS, 0, -1);
-                roomToUpdate.memberDetail.put(getCurrentUserUid(), member.toMap());
-
-                // specify locations in db to update
-                Map<String, Object> childUpdates = new HashMap<>();
-                childUpdates.put("/rooms/" + roomId + "/memberDetail", roomToUpdate.memberDetail);
-                childUpdates.put("/rooms/" + roomId + "/members/" + getCurrentUserUid(), true);
-
-                // update db
-                databaseRef.updateChildren(childUpdates);
-
-                showSnackbar(findViewById(R.id.activity_main_layout), "Joined room!");
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
     public Query getJoinedRoomsQuery() {
-        Query joinedRoomsQuery = databaseRef.child("rooms").orderByChild("members/"+getCurrentUserUid()).equalTo(true)
+        Query joinedRoomsQuery = databaseRef.child("rooms").orderByChild("members/"+getCurrentUserUid())
                 .limitToLast(100);
 
         joinedRoomsQuery.addValueEventListener(new ValueEventListener() {
@@ -315,7 +403,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 hideProgressDialog();
 
-                if (dataSnapshot.getValue() == null) {
+                boolean joinedAny = false;
+
+                for (DataSnapshot roomDataSnapshot : dataSnapshot.getChildren()) {
+                    Room room = roomDataSnapshot.getValue(Room.class);
+                    if (room.members.containsKey(getCurrentUserUid())) {
+                        joinedAny = true;
+                    }
+                }
+
+                if (!joinedAny) {
                     roomsRecyclerView.setVisibility(View.GONE);
                     emptyMessageLinearLayout.setVisibility(View.VISIBLE);
                 } else {
@@ -345,6 +442,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         for (DataSnapshot roomDataSnapshot : dataSnapshot.getChildren()) {
             Room room = roomDataSnapshot.getValue(Room.class);
 
+            if (!room.members.containsKey(getCurrentUserUid())) continue;
+
             // convert room's timestamp into month year
             String monthYear = getMonthYear(room.timestamp);
             if (!sectionTimeStamp.containsKey(monthYear))
@@ -356,6 +455,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         for (DataSnapshot roomDataSnapshot : dataSnapshot.getChildren()) {
             String roomUid = roomDataSnapshot.getKey();
             Room room = roomDataSnapshot.getValue(Room.class);
+
+            if (!room.members.containsKey(getCurrentUserUid())) continue;
 
             // convert room's timestamp into month year
             String monthYear = getMonthYear(room.timestamp);

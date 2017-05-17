@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -24,6 +25,8 @@ public class RoomViewHolder extends RecyclerView.ViewHolder {
     private static final int ORANGE = Color.parseColor("#ffa124");
     private static final int GREEN = Color.parseColor("#5c983d");
 
+    public LinearLayout listItem;
+
     public TextView sectionTextView;
     public TextView titleTextView;
     public TextView dateTextView;
@@ -35,6 +38,9 @@ public class RoomViewHolder extends RecyclerView.ViewHolder {
     public RoomViewHolder(View itemView) {
         super(itemView);
 
+        listItem = (LinearLayout) itemView.findViewById(R.id.item_room_listItem);
+        listItem.setVisibility(View.GONE);
+
         sectionTextView = (TextView) itemView.findViewById(R.id.item_room_sectionHeader);
         titleTextView = (TextView) itemView.findViewById(R.id.item_room_roomTitle);
         dateTextView = (TextView) itemView.findViewById(R.id.item_room_roomDate);
@@ -42,7 +48,12 @@ public class RoomViewHolder extends RecyclerView.ViewHolder {
         iconImageView = (ImageView) itemView.findViewById(R.id.item_room_roomIcon);
     }
 
+    public void hide() {
+        listItem.setVisibility(View.GONE);
+    }
+
     public void bindToRoom(Room room, String currentUserUid) {
+        listItem.setVisibility(View.VISIBLE);
         // set timestamp
         timestamp = room.timestamp;
 
@@ -65,14 +76,17 @@ public class RoomViewHolder extends RecyclerView.ViewHolder {
             case Member.PAYMENT_SETTLED:
                 iconImageView.setBackgroundTintList(ColorStateList.valueOf(GREEN));
                 break;
-            case Member.EXPECTING_PAYMENT: case Member.PAID_CHANGE: case Member.PAID_CONFIRM:
+            case Member.EXPECTING_PAYMENT: case Member.PAID_CHANGE:
                 iconImageView.setBackgroundTintList(ColorStateList.valueOf(ORANGE));
                 break;
             case Member.NO_STATUS:
                 iconImageView.setBackgroundTintList(ColorStateList.valueOf(RED));
                 break;
             default:
-                iconImageView.setBackgroundTintList(ColorStateList.valueOf(RED));
+                if (currentUserStatus.endsWith("confirmation."))
+                    iconImageView.setBackgroundTintList(ColorStateList.valueOf(ORANGE));
+                else
+                    iconImageView.setBackgroundTintList(ColorStateList.valueOf(RED));
                 break;
         }
     }

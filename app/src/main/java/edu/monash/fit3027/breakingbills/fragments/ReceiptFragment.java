@@ -59,7 +59,7 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
     private FloatingActionButton cameraButton;
 
     // arraylist of uris
-    private ArrayList<String> photoUris;
+    private ArrayList<String> photoUids;
 
     public ReceiptFragment() {}
 
@@ -79,7 +79,7 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
         cameraButton = (FloatingActionButton) rootView.findViewById(R.id.fragment_receipt_cameraButton);
         cameraButton.setOnClickListener(this);
 
-        photoUris = new ArrayList<>();
+        photoUids = new ArrayList<>();
 
         return rootView;
     }
@@ -127,10 +127,10 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
 
                                 Intent intent = new Intent(getActivity(), PhotoActivity.class);
 
-                                System.out.println("BEFORE LEAVING");
-                                System.out.println(photoUris);
+                                System.out.println(photoUids);
 
-                                intent.putStringArrayListExtra("photoUris", photoUris);
+                                intent.putExtra("roomUid", getRoomActivity().getRoomUid());
+                                intent.putStringArrayListExtra("photoUids", photoUids);
                                 intent.putExtra("position", position);
 
                                 startActivity(intent);
@@ -152,13 +152,11 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
         roomReceiptsQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                photoUris.clear();
+                photoUids.clear();
 
                 // iterate through every receipt
                 for (DataSnapshot receiptDataSnapshot : dataSnapshot.getChildren()) {
-                    Receipt receipt = receiptDataSnapshot.getValue(Receipt.class);
-
-                    photoUris.add(receipt.uri);
+                    photoUids.add(receiptDataSnapshot.getKey());
                 }
 
                 instance.getRoomActivity().hideProgressDialog();

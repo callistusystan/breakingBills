@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
-    android:id="@+id/fragment_menu_bottom"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
@@ -10,9 +9,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
+        android:id="@+id/payment_dialog_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set your amount"
+        android:text="Set your cost"
         android:textSize="18dp"
         android:textColor="#000"
         android:textStyle="bold" />
@@ -24,15 +24,15 @@
         android:layout_marginTop="8dp">
 
         <EditText
-            android:id="@+id/set_payment_dialog_amountEditText"
+            android:id="@+id/payment_dialog_amountEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:textSize="16dp"
             android:hint="Amount"
-            android:inputType="text"
+            android:inputType="numberDecimal"
             android:maxLength="15"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:textSize="16dp" />
     </android.support.design.widget.TextInputLayout>
 
 </LinearLayout>

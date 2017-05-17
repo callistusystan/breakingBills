@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import edu.monash.fit3027.breakingbills.R;
+import edu.monash.fit3027.breakingbills.Utils;
 import edu.monash.fit3027.breakingbills.models.Member;
 
 /**
@@ -16,9 +17,9 @@ import edu.monash.fit3027.breakingbills.models.Member;
 
 public class MemberViewHolder extends RecyclerView.ViewHolder {
 
-    private static final int RED = Color.parseColor("#e61610");
-    private static final int ORANGE = Color.parseColor("#ffa124");
-    private static final int GREEN = Color.parseColor("#5c983d");
+    public static final int RED = Color.parseColor("#e61610");
+    public static final int ORANGE = Color.parseColor("#ffa124");
+    public static final int GREEN = Color.parseColor("#5c983d");
 
     public TextView nicknameTextView;
     public TextView amountTextView;
@@ -42,12 +43,19 @@ public class MemberViewHolder extends RecyclerView.ViewHolder {
         else
             nicknameTextView.setText(member.nickname + nicknameSuffix);
 
-        // set amount
+        // set cost
         if (!member.isHost) {
-            if (member.amount == -1)
+            amountTextView.setTextColor(RED);
+            if (member.status.equals(Member.NO_STATUS)) {
                 amountTextView.setText("TBD");
-            else
-                amountTextView.setText(String.format("$%d.%02d", member.amount/100, member.amount%100));
+            } else {
+                amountTextView.setText(Utils.convertLongToStringCurrency(member.cost));
+                if (member.cost == member.amountPaid){
+                    amountTextView.setTextColor(GREEN);
+                } else if (member.amountPaid > member.cost) {
+                    amountTextView.setTextColor(ORANGE);
+                }
+            }
         }
 
         // set status and icon
@@ -56,14 +64,17 @@ public class MemberViewHolder extends RecyclerView.ViewHolder {
             case Member.PAYMENT_SETTLED:
                 iconImageView.setBackgroundTintList(ColorStateList.valueOf(GREEN));
                 break;
-            case Member.EXPECTING_PAYMENT: case Member.PAID_CHANGE: case Member.PAID_CONFIRM:
+            case Member.EXPECTING_PAYMENT: case Member.PAID_CHANGE:
                 iconImageView.setBackgroundTintList(ColorStateList.valueOf(ORANGE));
                 break;
             case Member.NO_STATUS:
                 iconImageView.setBackgroundTintList(ColorStateList.valueOf(RED));
                 break;
             default:
-                iconImageView.setBackgroundTintList(ColorStateList.valueOf(RED));
+                if (member.status.endsWith("confirmation."))
+                    iconImageView.setBackgroundTintList(ColorStateList.valueOf(ORANGE));
+                else
+                    iconImageView.setBackgroundTintList(ColorStateList.valueOf(RED));
                 break;
         }
     }

@@ -78,12 +78,13 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
         // Now we get the data passed via intent
         Intent i = getIntent();
         int position = i.getIntExtra("position", 0);
-        ArrayList<String> photoUris = i.getStringArrayListExtra("photoUris");
+        String roomUid = i.getStringExtra("roomUid");
+        ArrayList<String> photoUids = i.getStringArrayListExtra("photoUids");
 
         // initialize fragments
         fragments = new ArrayList<>();
-        for (String uri : photoUris) {
-            fragments.add(new FullScreenReceiptFragment(uri));
+        for (String photoUid : photoUids) {
+            fragments.add(new FullScreenReceiptFragment(roomUid, photoUid));
         }
 
         // set the viewpager's adapter to an adapter of the fragments

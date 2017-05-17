@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".MainActivity">
+
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/fragment_payment_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F5F5F5"
+        tools:context="edu.monash.fit3027.breakingbills.MainActivity">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/fragment_payment_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            tools:listitem="@layout/item_payment" />
+
+
+
+        <LinearLayout
+            android:id="@+id/fragment_payment_emptyView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone" >
+
+            <android.support.design.widget.FloatingActionButton
+                android:layout_width="144dp"
+                android:layout_height="144dp"
+                android:src="@drawable/ic_folder"
+                android:tint="#606060"
+                app:backgroundTint="#d6d6d6"
+                app:elevation="0dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:paddingBottom="60dp"
+                android:textSize="18sp"
+                android:text="No payments in the room" />
+        </LinearLayout>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</FrameLayout>

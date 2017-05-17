@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#EEEEEE"
+    android:background="#F5F5F5"
     tools:context="edu.monash.fit3027.breakingbills.RoomActivity">
 
     <android.support.design.widget.TabLayout
         android:id="@+id/activity_room_tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
         android.support.design:tabBackground="@color/colorPrimary"
         android.support.design:tabIndicatorColor="@color/colorAccent"
         android.support.design:tabTextColor="#FFF"
@@ -24,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/activity_room_tabs"
-        android:background="#E5E5E5"
+        android:background="@drawable/border"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
         android:paddingLeft="10dp"
