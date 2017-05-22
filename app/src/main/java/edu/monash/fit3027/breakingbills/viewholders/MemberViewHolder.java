@@ -44,39 +44,30 @@ public class MemberViewHolder extends RecyclerView.ViewHolder {
             nicknameTextView.setText(member.nickname + nicknameSuffix);
 
         // set cost
-        if (!member.isHost) {
-            amountTextView.setTextColor(RED);
-            if (member.status.equals(Member.NO_STATUS)) {
-                amountTextView.setText("TBD");
-            } else {
-                amountTextView.setText(Utils.convertLongToStringCurrency(member.cost));
-                if (member.cost == member.amountPaid){
-                    amountTextView.setTextColor(GREEN);
-                } else if (member.amountPaid > member.cost) {
-                    amountTextView.setTextColor(ORANGE);
-                }
+        amountTextView.setTextColor(RED);
+        if (member.cost == 0) {
+            amountTextView.setText("TBD");
+        } else {
+            amountTextView.setText(Utils.convertLongToStringCurrency(member.cost));
+            if (member.cost == member.amountPaid){
+                amountTextView.setTextColor(GREEN);
+            } else if (member.amountPaid > member.cost) {
+                amountTextView.setTextColor(ORANGE);
             }
         }
 
         // set status and icon
-        statusTextView.setText(member.status);
-        switch (member.status) {
-            case Member.PAYMENT_SETTLED:
-                iconImageView.setBackgroundTintList(ColorStateList.valueOf(GREEN));
-                break;
-            case Member.EXPECTING_PAYMENT: case Member.PAID_CHANGE:
-                iconImageView.setBackgroundTintList(ColorStateList.valueOf(ORANGE));
-                break;
-            case Member.NO_STATUS:
-                iconImageView.setBackgroundTintList(ColorStateList.valueOf(RED));
-                break;
-            default:
-                if (member.status.endsWith("confirmation."))
-                    iconImageView.setBackgroundTintList(ColorStateList.valueOf(ORANGE));
-                else
-                    iconImageView.setBackgroundTintList(ColorStateList.valueOf(RED));
-                break;
-        }
+        String status = Utils.determineMemberStatus(member);
+        statusTextView.setText(status);
+
+        if (status.startsWith("Owes") || status.equals("No status"))
+            iconImageView.setBackgroundTintList(ColorStateList.valueOf(RED));
+        else if (status.startsWith("Paid"))
+            iconImageView.setBackgroundTintList(ColorStateList.valueOf(ORANGE));
+        else if (status.equals("Payment settled"))
+            iconImageView.setBackgroundTintList(ColorStateList.valueOf(GREEN));
+        else
+            iconImageView.setBackgroundTintList(ColorStateList.valueOf(RED));
     }
 }
 

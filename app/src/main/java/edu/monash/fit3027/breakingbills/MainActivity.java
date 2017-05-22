@@ -40,6 +40,7 @@ import edu.monash.fit3027.breakingbills.viewholders.RoomViewHolder;
 
 import static edu.monash.fit3027.breakingbills.Utils.convertLongToStringCurrency;
 import static edu.monash.fit3027.breakingbills.Utils.getMonthYear;
+import static java.lang.Math.abs;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -80,6 +81,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         // init firebase components
         auth = FirebaseAuth.getInstance();
         databaseRef = FirebaseDatabase.getInstance().getReference();
+
+        // ensure one instance is up
+        FirebaseHelper.getInstance();
 
         // init hash maps
         sectionStartsAtRoomUid = new HashMap<>();
@@ -200,13 +204,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 oweTextView.setText(convertLongToStringCurrency(user.owe));
                 isOwedTextView.setText(convertLongToStringCurrency(user.isOwed));
                 if (user.isOwed > user.owe) {
-                    balanceTextView.setText("+" + convertLongToStringCurrency(user.isOwed - user.owe));
+                    balanceTextView.setText("+"+convertLongToStringCurrency(user.isOwed - user.owe));
                     balanceTextView.setTextColor(MemberViewHolder.GREEN);
                 } else if (user.isOwed == user.owe) {
                     balanceTextView.setText("+-"+ convertLongToStringCurrency(0));
                     balanceTextView.setTextColor(MemberViewHolder.GREEN);
                 } else {
-                    balanceTextView.setText("-"+ convertLongToStringCurrency(user.isOwed-user.owe));
+                    balanceTextView.setText("-"+ convertLongToStringCurrency(abs(user.isOwed-user.owe)));
                     balanceTextView.setTextColor(MemberViewHolder.RED);
                 }
             }
@@ -356,7 +360,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                                         roomToUpdate.members.put(getCurrentUserUid(), roomToUpdate.timestamp+1);
 
                                         // init the member
-                                        Member member = new Member(nickname, false, Member.NO_STATUS);
+                                        Member member = new Member(nickname, false);
                                         roomToUpdate.memberDetail.put(getCurrentUserUid(), member.toMap());
 
                                         // specify locations in db to update

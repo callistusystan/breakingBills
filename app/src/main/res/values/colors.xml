@@ -3,6 +3,9 @@
     <color name="colorPrimary">#33691E</color>
     <color name="colorPrimaryDark">#000</color>
     <color name="colorAccent">#87c168</color>
+    <color name="RED">#e61610</color>
+    <color name="ORANGE">#ffa124</color>
+    <color name="YELLOW">#5c983d</color>
 
     <color name="black_overlay">#66000000</color>
 </resources>

@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import edu.monash.fit3027.breakingbills.R;
+import edu.monash.fit3027.breakingbills.Utils;
 import edu.monash.fit3027.breakingbills.models.Member;
 import edu.monash.fit3027.breakingbills.models.Room;
 
@@ -70,25 +71,18 @@ public class RoomViewHolder extends RecyclerView.ViewHolder {
         dateTextView.setText(sfd.format(date));
 
         // set status and icon
-        String currentUserStatus = room.memberDetail.get(currentUserUid).get("status").toString();
-        statusTextView.setText(currentUserStatus);
-        switch (currentUserStatus) {
-            case Member.PAYMENT_SETTLED:
-                iconImageView.setBackgroundTintList(ColorStateList.valueOf(GREEN));
-                break;
-            case Member.EXPECTING_PAYMENT: case Member.PAID_CHANGE:
-                iconImageView.setBackgroundTintList(ColorStateList.valueOf(ORANGE));
-                break;
-            case Member.NO_STATUS:
-                iconImageView.setBackgroundTintList(ColorStateList.valueOf(RED));
-                break;
-            default:
-                if (currentUserStatus.endsWith("confirmation."))
-                    iconImageView.setBackgroundTintList(ColorStateList.valueOf(ORANGE));
-                else
-                    iconImageView.setBackgroundTintList(ColorStateList.valueOf(RED));
-                break;
-        }
+        String status = Utils.determineMemberStatus(room.memberDetail.get(currentUserUid));
+        statusTextView.setText(status);
+
+        if (status.startsWith("Owes") || status.equals("No status"))
+            iconImageView.setBackgroundTintList(ColorStateList.valueOf(RED));
+        else if (status.startsWith("Paid"))
+            iconImageView.setBackgroundTintList(ColorStateList.valueOf(ORANGE));
+        else if (status.equals("Payment settled"))
+            iconImageView.setBackgroundTintList(ColorStateList.valueOf(GREEN));
+        else
+            iconImageView.setBackgroundTintList(ColorStateList.valueOf(RED));
+
     }
 
     public void showSectionHeader() {

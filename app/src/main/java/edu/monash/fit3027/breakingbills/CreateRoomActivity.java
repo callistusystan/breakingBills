@@ -113,7 +113,8 @@ public class CreateRoomActivity extends BaseActivity implements View.OnClickList
                             room.members.put(currentUserUid, ServerValue.TIMESTAMP);
 
                             // Init member and details
-                            Member member = new Member(nickname, true, Member.EXPECTING_PAYMENT);
+                            Member member = new Member(nickname, true);
+                            member.amountPaid = totalAmount;
 
                             room.memberDetail.put(currentUserUid, member.toMap());
 

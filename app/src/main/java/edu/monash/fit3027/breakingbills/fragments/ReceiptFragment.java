@@ -121,7 +121,7 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
 
                         // Set click listener for the whole room view
                         final String receiptUid = receiptRef.getKey();
-                                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
 

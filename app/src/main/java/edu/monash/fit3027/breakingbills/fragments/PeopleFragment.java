@@ -14,9 +14,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.bumptech.glide.util.Util;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,14 +27,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import edu.monash.fit3027.breakingbills.FirebaseHelper;
 import edu.monash.fit3027.breakingbills.R;
 import edu.monash.fit3027.breakingbills.RoomActivity;
 import edu.monash.fit3027.breakingbills.Utils;
 import edu.monash.fit3027.breakingbills.models.Member;
-import edu.monash.fit3027.breakingbills.models.Payment;
+import edu.monash.fit3027.breakingbills.models.Room;
 import edu.monash.fit3027.breakingbills.viewholders.MemberViewHolder;
 
 import static edu.monash.fit3027.breakingbills.Utils.convertStringToLongCurrency;
@@ -48,10 +48,6 @@ public class PeopleFragment extends RoomFragment implements View.OnClickListener
 
     // button
     private FloatingActionButton addButton;
-
-    // necessary variables
-    private String roomUid;
-    private String currentUserUid;
 
     public PeopleFragment() {}
 
@@ -74,10 +70,6 @@ public class PeopleFragment extends RoomFragment implements View.OnClickListener
         addButton = (FloatingActionButton) rootView.findViewById(R.id.fragment_all_people_addButton);
         addButton.setOnClickListener(this);
 
-        // init necessary variables
-        roomUid = getRoomActivity().getRoomUid();
-        currentUserUid = getRoomActivity().getCurrentUserUid();
-
         return rootView;
     }
 
@@ -98,12 +90,12 @@ public class PeopleFragment extends RoomFragment implements View.OnClickListener
     }
 
     public boolean isHost(String memberUid) {
-        String hostUid = getRoomActivity().getHostUid();
+        String hostUid = getRoomActivity().getRoomHostUid();
         return memberUid.equals(hostUid);
     }
 
     public boolean isHost() {
-        return isHost(currentUserUid);
+        return isHost(getCurrentUserUid());
     }
 
     public void initMembersRecyclerView() {
@@ -136,27 +128,52 @@ public class PeopleFragment extends RoomFragment implements View.OnClickListener
                             // get views
                             final TextView payment_dialog_label = (TextView) dialogView.findViewById(R.id.payment_dialog_label);
                             final EditText payment_dialog_amountEditText = (EditText) dialogView.findViewById(R.id.payment_dialog_amountEditText);
+                            final CheckBox payment_dialog_checkbox = (CheckBox) dialogView.findViewById(R.id.payment_dialog_changeCheckBox);
+                            payment_dialog_checkbox.setVisibility(View.GONE);
 
-                            Map<String, Boolean> myPendingPayments = (Map<String, Boolean>) getRoom().memberDetail.get(getCurrentUserUid()).get("pendingPayments");
+                            final String myUid = getCurrentUserUid();
+                            final String clickedMemberUid = memberUid;
+
+                            Room room = FirebaseHelper.getInstance().getRooms().get(getRoomUid());
+                            final Member myDetails = new Member(room.memberDetail.get(myUid));
+                            final Member clickedMemberDetails = new Member(room.memberDetail.get(clickedMemberUid));
+
+                            if (myDetails.cost == 0 && !myUid.equals(clickedMemberUid)) {
+                                getRoomActivity().showMessageDialog(R.layout.message_dialog,
+                                        "Oops!",
+                                        "You have to set your cost first!",
+                                        "Ok",
+                                        "");
+                                return;
+                            }
 
                             // if you are the host, only a dialog if you owe them change
                             // if you are a member, and clicking on the host, make it MAKE payment
                             // if you are a member, and clicking on yourself, make it SET cost
-                            if ((isHost() && model.cost < 0) || (!isHost() && isHost(memberUid))) {
+                            if ((isHost() && !isHost(clickedMemberUid) && clickedMemberDetails.amountPaid > clickedMemberDetails.cost)
+                                    || (!isHost() && isHost(clickedMemberUid) && myDetails.amountPaid < myDetails.cost)
+                                ) {
                                 // show dialog if already have a pending payment
-                                if (myPendingPayments != null && myPendingPayments.containsKey(memberUid)) {
+                                if (myDetails.pendingPayments != null && myDetails.pendingPayments.containsKey(memberUid)) {
                                     getRoomActivity().showMessageDialog(R.layout.message_dialog,
                                                                         "Oops!",
-                                                                        "You already have a payment pending to this user! Go to the payments tab to edit it!",
+                                                                        "You already have a payment pending to this user! Go to the Payments Tab to edit it!",
                                                                         "Ok",
                                                                         "");
                                     return;
                                 }
                                 payment_dialog_label.setText("Make payment");
-                            } else if (!isHost() && memberUid.equals(getRoomActivity().getCurrentUserUid())) {
+                                payment_dialog_checkbox.setVisibility(View.VISIBLE);
+                            } else if (myUid.equals(clickedMemberUid)) {
                                 payment_dialog_label.setText("Set cost");
-                            } else
+                            } else {
+                                getRoomActivity().showMessageDialog(R.layout.message_dialog,
+                                        "Oops!",
+                                        "No action can be done with this user!",
+                                        "Ok",
+                                        "");
                                 return;
+                            }
 
                             builder.setView(dialogView)
                                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -182,28 +199,29 @@ public class PeopleFragment extends RoomFragment implements View.OnClickListener
                                     button.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
-                                            String amount = payment_dialog_amountEditText.getText().toString().trim();
+                                            final String amount = payment_dialog_amountEditText.getText().toString().trim();
 
                                             // only process if both fields are not empty
                                             if (!amount.equals("") && Utils.convertStringToLongCurrency(amount) > 0){
                                                 // if you are the host, and you owe someone change, MAKE payment
                                                 // if you are a member, and clicking on the host, make it MAKE payment
                                                 // if you are a member, and clicking on yourself, make it SET cost
-                                                if ((isHost() && model.cost < 0) || (!isHost() && isHost(memberUid))) {
-                                                    makePayment(memberUid, amount);
-                                                    getRoomActivity().showSnackbar(
-                                                            getRoomActivity().findViewById(R.id.fragment_all_people_layout),
+                                                if ((isHost() && !isHost(clickedMemberUid) && clickedMemberDetails.amountPaid > clickedMemberDetails.cost)
+                                                        || (!isHost() && isHost(clickedMemberUid) && myDetails.amountPaid < myDetails.cost)
+                                                    ) {
+                                                    boolean wantChange = payment_dialog_checkbox.isChecked();
+                                                    makePayment(clickedMemberUid, amount, wantChange);
+                                                    getRoomActivity().showSnackbar(getRoomActivity().findViewById(R.id.fragment_all_people_layout),
                                                             "Payment sent! Waiting for confirmation");
-                                                } else if (!isHost() && memberUid.equals(getRoomActivity().getCurrentUserUid())) {
+                                                } else if (myUid.equals(clickedMemberUid)) {
                                                     setAmount(amount);
-                                                    getRoomActivity().showSnackbar(
-                                                            getRoomActivity().findViewById(R.id.fragment_all_people_layout),
-                                                            "Amount set!");
+                                                    getRoomActivity().showSnackbar(getRoomActivity().findViewById(R.id.fragment_all_people_layout),
+                                                                                    "Amount set!");
                                                 }
 
                                                 ((AlertDialog) dialog).hide();
                                             } else {
-                                                payment_dialog_amountEditText.setError("You must enter a cost greater than 0!");
+                                                payment_dialog_amountEditText.setError("You must enter an amount greater than 0!");
                                             }
                                         }
                                     });
@@ -214,77 +232,25 @@ public class PeopleFragment extends RoomFragment implements View.OnClickListener
                     });
 
                     // set up UI components
-                    viewHolder.bindToMember(model, memberUid, currentUserUid);
+                    viewHolder.bindToMember(model, memberUid, getCurrentUserUid());
                 }
             };
         membersRecyclerView.setAdapter(recyclerAdapter);
     }
 
-    public void setAmount(String amount) {
-        final long amountInLong = convertStringToLongCurrency(amount);
+    public void setAmount(String newCostString) {
+        final long newCost = convertStringToLongCurrency(newCostString);
 
-        databaseRef.child("users/").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                long prevAmount = (long) getRoom().memberDetail.get(currentUserUid).get("cost");
-
-                String hostUid = getRoomActivity().getHostUid();
-                long hostOverallIsOwedAmount = (long)dataSnapshot.child(hostUid+"/isOwed").getValue();
-                long myOverallOweAmount = (long)dataSnapshot.child(currentUserUid+"/owe").getValue();
-
-                // specify locations in db to update
-                Map<String, Object> childUpdates = new HashMap<>();
-
-                // update host's isOwed
-                childUpdates.put("users/"+hostUid+"/isOwed", hostOverallIsOwedAmount - prevAmount + amountInLong);
-
-                // update user's owe
-                childUpdates.put("users/"+currentUserUid+"/owe", myOverallOweAmount - prevAmount + amountInLong);
-
-                // update user's cost in room
-                childUpdates.put("rooms/"+getRoomActivity().getRoomUid()+"/memberDetail/"+ currentUserUid +"/cost", amountInLong);
-
-                // update user's status in room
-                childUpdates.put("rooms/"+getRoomActivity().getRoomUid()+"/memberDetail/"+ currentUserUid +"/status",
-                        "Owes " + Utils.convertLongToStringCurrency(amountInLong));
-
-                // update db
-                databaseRef.updateChildren(childUpdates);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        FirebaseHelper.getInstance().setCost(getRoomUid(), getCurrentUserUid(), newCost);
     }
 
-    public void makePayment(String memberUid, String amount) {
-        String curUserUid = getRoomActivity().getCurrentUserUid();
-        long paidAmount = convertStringToLongCurrency(amount);
-
-        // specify locations in db to update
-        Map<String, Object> childUpdates = new HashMap<>();
-
-        // update my status
-        childUpdates.put("rooms/"+getRoomUid()+"/memberDetail/"+curUserUid+"/status",
-                "Paid " + Utils.convertLongToStringCurrency(paidAmount) + ", but waiting for confirmation.");
-
-        // update my pendingPayments
-        childUpdates.put("rooms/"+getRoomUid()+"/memberDetail/"+curUserUid+"/pendingPayments/"+memberUid, true);
-
-        // store this payment in database
-        Payment payment = new Payment(curUserUid, memberUid, paidAmount);
-        String paymentUid = databaseRef.child("rooms/"+getRoomActivity().getRoomUid()+"/payments/").push().getKey();
-        childUpdates.put("rooms/"+getRoomUid()+"/payments/"+paymentUid,
-                payment.toMap());
-
-        // update db
-        databaseRef.updateChildren(childUpdates);
+    public void makePayment(String payeeUid, String newPaymentString, boolean wantChange) {
+        final long newPayment = Utils.convertStringToLongCurrency(newPaymentString);
+        FirebaseHelper.getInstance().makePayment(getRoomUid(), getCurrentUserUid(), payeeUid, newPayment, wantChange);
     }
 
     public Query getMembersQuery() {
-        Query membersQuery = databaseRef.child("rooms/"+roomUid+"/memberDetail").orderByChild("timestamp");
+        Query membersQuery = databaseRef.child("rooms/"+getRoomUid()+"/memberDetail").orderByChild("timestamp");
 
         // set up a listener to hide the progress dialog
         membersQuery.addValueEventListener(new ValueEventListener() {

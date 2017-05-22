@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAlignment="center"
-            android:background="@drawable/border"
+            android:background="#E0E0E0"
             android:showDividers="beginning"
             android:orientation="horizontal">
             <LinearLayout
@@ -109,6 +109,7 @@
             android:id="@+id/activity_main_roomsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@drawable/border"
             android:clipToPadding="false"
             android:layout_gravity="end|bottom"
             android:scrollbars="vertical" />
@@ -117,6 +118,7 @@
             android:id="@+id/activity_main_emptyView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@drawable/border"
             android:orientation="vertical"
             android:gravity="center"
             android:layout_gravity="end|bottom"

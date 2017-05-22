@@ -19,6 +19,7 @@ public class Payment {
     public long amount;
     public boolean hasResponded = false;
     public boolean isConfirmed = false;
+    public boolean wantChange = true;
     public long timestamp;
 
     public Payment() {
@@ -30,6 +31,16 @@ public class Payment {
         this.amount = amount;
     }
 
+    public Payment(Map<String, Object> payment) {
+        this.payerUid = (String) payment.get("payerUid");
+        this.payeeUid = (String) payment.get("payeeUid");
+        this.amount = (long) payment.get("amount");
+        this.hasResponded = (boolean) payment.get("hasResponded");
+        this.isConfirmed = (boolean) payment.get("isConfirmed");
+        this.wantChange = (boolean) payment.get("wantChange");
+        this.timestamp = (long) payment.get("timestamp");
+    }
+
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
@@ -38,6 +49,7 @@ public class Payment {
         result.put("amount", amount);
         result.put("hasResponded", hasResponded);
         result.put("isConfirmed", isConfirmed);
+        result.put("wantChange", wantChange);
         result.put("timestamp", ServerValue.TIMESTAMP);
 
         return result;

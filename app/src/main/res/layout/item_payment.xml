@@ -73,6 +73,14 @@
                 android:textColor="#000"
                 android:textSize="13sp" />
 
+            <TextView
+                android:id="@+id/item_payment_pending"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text=" (pending)"
+                android:textSize="13sp" />
+
             <View
                 android:layout_width="0dp"
                 android:layout_height="0dp"
