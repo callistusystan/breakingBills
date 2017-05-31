@@ -1,7 +1,5 @@
 package edu.monash.fit3027.breakingbills;
 
-import android.content.Intent;
-import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -14,7 +12,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -29,9 +26,17 @@ import java.util.Map;
 import edu.monash.fit3027.breakingbills.models.Member;
 import edu.monash.fit3027.breakingbills.models.Room;
 
-public class CreateRoomActivity extends BaseActivity implements View.OnClickListener {
+/**
+ * Activity screen for creating a room in the database. Uses the Volley library to call a Firebase
+ * cloud function to obtain a unique and readable Uid for the room
+ *
+ * Reference:
+ *  1. https://developer.android.com/training/volley/index.html for code to perform a HTTP GET request
+ *
+ * Created by Callistus on 29/4/2017.
+ */
 
-    private static final int REQUEST_CONTACT = 100;
+public class CreateRoomActivity extends BaseActivity implements View.OnClickListener {
 
     // edit texts
     private EditText roomTitleEditText;
@@ -59,19 +64,10 @@ public class CreateRoomActivity extends BaseActivity implements View.OnClickList
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CONTACT) {
-            switch (RESULT_OK) {
-                case REQUEST_CONTACT:
-                    break;
-            }
-
-        }
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
+        // if the exit button is tapped, call the finish lifecycle method
         if (itemId == android.R.id.home) {
             finish();
             return true;
@@ -80,6 +76,12 @@ public class CreateRoomActivity extends BaseActivity implements View.OnClickList
         }
     }
 
+    /**
+     * Gets a unique readable roomUid using Volley to call my Firebase cloud function.
+     * Upon success, gets the roomUid and creates and joins the room in the firebase database
+     *
+     * Reference: https://developer.android.com/training/volley/index.html
+     */
     private void writeNewRoom() {
         showProgressDialog("Creating room");
         // get database ref
@@ -152,6 +154,11 @@ public class CreateRoomActivity extends BaseActivity implements View.OnClickList
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
     }
 
+    /**
+     * A method to check if each field is entered, and to set an error if not entered.
+     *
+     * @return a boolean - true if all fields are entered, false otherwise
+     */
     public boolean allFieldsEntered() {
         // returns true if all fields are entered
         boolean valid = true;

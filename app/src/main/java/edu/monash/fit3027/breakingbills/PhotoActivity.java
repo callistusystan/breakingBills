@@ -15,8 +15,11 @@ import java.util.ArrayList;
 import edu.monash.fit3027.breakingbills.fragments.FullScreenReceiptFragment;
 
 /**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
+ * An activity to show photos in full screen, allowing users to swipe between photos.
+ *
+ * References:
+ *  1. CameraDemo by Josh Olsen, provided in Moodle for logic in swiping between photos.
+ *  2. http://codegists.com/snippet/java/fullscreenactivityjava_mekkanizer_java for hiding the action bar.
  */
 public class PhotoActivity extends AppCompatActivity implements View.OnClickListener {
 

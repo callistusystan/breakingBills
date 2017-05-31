@@ -3,7 +3,6 @@ package edu.monash.fit3027.breakingbills.viewholders;
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.media.Image;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,15 +13,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.util.Util;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,11 +23,15 @@ import edu.monash.fit3027.breakingbills.FirebaseHelper;
 import edu.monash.fit3027.breakingbills.R;
 import edu.monash.fit3027.breakingbills.Utils;
 import edu.monash.fit3027.breakingbills.fragments.PaymentFragment;
-import edu.monash.fit3027.breakingbills.models.Member;
 import edu.monash.fit3027.breakingbills.models.Payment;
 import edu.monash.fit3027.breakingbills.models.Room;
 
 /**
+ * A list view holder to visually show payment information
+ *
+ * Reference:
+ *  1. https://github.com/firebase/quickstart-android for the idea of view holders
+ *
  * Created by Callistus on 28/4/2017.
  */
 
@@ -103,9 +100,11 @@ public class PaymentViewHolder extends RecyclerView.ViewHolder {
         payeeTextView.setText(payeeNickname);
 
         amountTextView.setText(" " + Utils.convertLongToStringCurrency(payment.amount));
+        statusTextView.setVisibility(View.GONE);
 
         // if already responded, show the status
         if (payment.hasResponded) {
+            statusTextView.setVisibility(View.VISIBLE);
             pendingTextView.setVisibility(View.GONE);
             if (payment.isConfirmed) {
                 statusTextView.setText("CONFIRMED");

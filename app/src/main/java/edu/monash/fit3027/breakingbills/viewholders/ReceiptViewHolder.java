@@ -12,15 +12,18 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import edu.monash.fit3027.breakingbills.R;
-import edu.monash.fit3027.breakingbills.models.Receipt;
 
 /**
+ * A list view holder to load and display a receipt image using Glide
+ *
+ * References:
+ *  1. https://github.com/firebase/quickstart-android for the idea of view holders
+ *  2. https://github.com/bumptech/glide for Glide related code
+ *
  * Created by Callistus on 3/5/2017.
  */
 

@@ -6,6 +6,9 @@ import edu.monash.fit3027.breakingbills.RoomActivity;
 import edu.monash.fit3027.breakingbills.models.Room;
 
 /**
+ * An abstract fragment class representing the base fragment to inherit from
+ * with methods to easily get room activity and metadata.
+ *
  * Created by Callistus on 1/5/2017.
  */
 

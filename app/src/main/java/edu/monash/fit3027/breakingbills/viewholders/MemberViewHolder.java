@@ -12,6 +12,11 @@ import edu.monash.fit3027.breakingbills.Utils;
 import edu.monash.fit3027.breakingbills.models.Member;
 
 /**
+ * A list view holder to visually show member information in a room
+ *
+ * Reference:
+ *  1. https://github.com/firebase/quickstart-android for the idea of view holders
+ *
  * Created by Callistus on 29/4/2017.
  */
 

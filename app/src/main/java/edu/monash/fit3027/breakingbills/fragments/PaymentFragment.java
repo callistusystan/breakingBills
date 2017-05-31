@@ -1,6 +1,12 @@
 package edu.monash.fit3027.breakingbills.fragments;
 
 /**
+ * A fragment class to show all payments made in a room. Also allows relevant users to interact
+ * with the payments.
+ *
+ * Reference:
+ *  1. https://github.com/firebase/quickstart-android for the Firebase recycler view
+ *
  * Created by Callistus on 30/4/2017.
  */
 
@@ -38,7 +44,6 @@ public class PaymentFragment extends RoomFragment {
 
     // necessary variables
     private String roomUid;
-    private String currentUserUid;
 
     public PaymentFragment() {}
 
@@ -62,7 +67,6 @@ public class PaymentFragment extends RoomFragment {
 
         // init necessary variables
         roomUid = getRoomActivity().getRoomUid();
-        currentUserUid = getRoomActivity().getCurrentUserUid();
 
         return rootView;
     }
@@ -75,6 +79,9 @@ public class PaymentFragment extends RoomFragment {
         initViews();
     }
 
+    /**
+     * A helper method to initialize all views in this fragment.
+     */
     public void initViews() {
         // Set up Layout Manager, reverse layout so it shows most recent at the top
         mManager = new LinearLayoutManager(getActivity()) {
@@ -90,6 +97,9 @@ public class PaymentFragment extends RoomFragment {
         initMembersRecyclerView();
     }
 
+    /**
+     * A helper method to initialize the recycler view of payments
+     */
     public void initMembersRecyclerView() {
         // Set up FirebaseRecyclerAdapter with the Query
         Query paymentsQuery = getPaymentsQuery();
@@ -119,6 +129,11 @@ public class PaymentFragment extends RoomFragment {
         paymentRecyclerView.setAdapter(recyclerAdapter);
     }
 
+    /**
+     * A helper method to get the query for all payments made in this room
+     *
+     * @return a query for all payments made in this room
+     */
     public Query getPaymentsQuery() {
         Query paymentsQuery = databaseRef.child("rooms/"+roomUid+"/payments");
 
@@ -126,6 +141,7 @@ public class PaymentFragment extends RoomFragment {
         paymentsQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                // show an empty message if there are no payments
                 if (dataSnapshot.getValue() == null) {
                     paymentRecyclerView.setVisibility(View.GONE);
                     emptyMessageLinearLayout.setVisibility(View.VISIBLE);

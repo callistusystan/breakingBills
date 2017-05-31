@@ -2,12 +2,16 @@ package edu.monash.fit3027.breakingbills.models;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.google.firebase.database.ServerValue;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * User class for representing a user in the database
+ *
+ * Reference:
+ *  1. https://github.com/firebase/quickstart-android Firebase class models
+ *
  * Created by Callistus on 27/4/2017.
  */
 

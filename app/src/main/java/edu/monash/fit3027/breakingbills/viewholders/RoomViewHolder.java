@@ -13,10 +13,14 @@ import java.util.Date;
 
 import edu.monash.fit3027.breakingbills.R;
 import edu.monash.fit3027.breakingbills.Utils;
-import edu.monash.fit3027.breakingbills.models.Member;
 import edu.monash.fit3027.breakingbills.models.Room;
 
 /**
+ * A list view holder to visually show room information
+ *
+ * Reference:
+ *  1. https://github.com/firebase/quickstart-android for the idea of view holders
+ *
  * Created by Callistus on 28/4/2017.
  */
 
@@ -47,10 +51,6 @@ public class RoomViewHolder extends RecyclerView.ViewHolder {
         dateTextView = (TextView) itemView.findViewById(R.id.item_room_roomDate);
         statusTextView = (TextView) itemView.findViewById(R.id.item_room_roomStatus);
         iconImageView = (ImageView) itemView.findViewById(R.id.item_room_roomIcon);
-    }
-
-    public void hide() {
-        listItem.setVisibility(View.GONE);
     }
 
     public void bindToRoom(Room room, String currentUserUid) {

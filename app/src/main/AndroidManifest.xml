@@ -31,7 +31,8 @@
             android:name=".PhotoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_photo"
-            android:theme="@style/FullscreenTheme"></activity>
+            android:theme="@style/FullscreenTheme" />
+        <activity android:name=".AboutAppActivity"></activity>
     </application>
 
 </manifest>

@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAlignment="center"
-            android:background="#E0E0E0"
+            android:background="@drawable/border"
             android:showDividers="beginning"
             android:orientation="horizontal">
             <LinearLayout

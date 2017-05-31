@@ -1,5 +1,6 @@
 package edu.monash.fit3027.breakingbills.fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,24 +17,26 @@ import com.google.firebase.storage.StorageReference;
 import edu.monash.fit3027.breakingbills.R;
 
 /**
+ * A fragment class to visually show a receipt in fullscreen view using Glide.
+ *
+ * Reference:
+ *  1. CameraDemo by Josh Olsen, provided in Moodle for full screen photoview setup
+ *  2. https://github.com/bumptech/glide for glide related code
+ *
  * Created by Callistus on 5/5/2017.
  */
 
 public class FullScreenReceiptFragment extends Fragment {
-
-    public static final String PHOTO_URI = "PHOTO_URI";
 
     private String roomUid;
     private String photoUid;
 
     public FullScreenReceiptFragment() {}
 
+    @SuppressLint("ValidFragment")
     public FullScreenReceiptFragment(String roomUid, String photoUid) {
         this.roomUid = roomUid;
         this.photoUid = photoUid;
-//        Bundle bundle = new Bundle(1); // Set bundle with a capacity of 1
-//        bundle.putString(PHOTO_URI, this.photoUid);
-//        this.setArguments(bundle);
     }
 
     @Override

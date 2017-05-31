@@ -10,6 +10,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,10 +44,21 @@ import static edu.monash.fit3027.breakingbills.Utils.convertLongToStringCurrency
 import static edu.monash.fit3027.breakingbills.Utils.getMonthYear;
 import static java.lang.Math.abs;
 
+/**
+ * The main activity screen the user is brought when starting the app
+ * Shows all the rooms the user has joined, with options to
+ * create/join rooms and view the about screen.
+ *
+ * Reference:
+ *  1. https://github.com/firebase/quickstart-android for the Firebase recycler view
+ *  2. https://developer.android.com/guide/topics/ui/dialogs.html for alert dialogs
+ *
+ * Created by Callistus on 29/4/2017.
+ */
+
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     public static final int CREATE_ROOM_REQ = 100;
-    public static final int ENTER_ROOM_REQ = 200;
 
     // firebase components
     private FirebaseAuth auth;
@@ -147,7 +160,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             signIn();
         } else {
             // user has signed in, so init rooms
-            loadFirebaseData();
+            initUserStatusView();
+            initRoomsRecyclerView();
         }
     }
 
@@ -155,20 +169,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // check if we returned from the Create Room Screen
         if (requestCode == CREATE_ROOM_REQ) {
+            // if we returned from the Create Room Screen with RESULT_OK, a room has been created
             if (resultCode == RESULT_OK) {
                 // show a snackbar that a room has been successfully created
                 showSnackbar(findViewById(R.id.activity_main_layout), "Room created!");
             }
-        } else if (requestCode == ENTER_ROOM_REQ) {
-            if (resultCode == RESULT_OK) {
-                // show a snackbar that user has left room
-                showSnackbar(findViewById(R.id.activity_main_layout), "Left room!");
-            }
         }
     }
 
+    /**
+     * A helper method to sign the user in anonymously, so that we can store the user in the
+     * firebase database.
+     */
     public void signIn() {
         // simply sign in anonymously
         auth.signInAnonymously()
@@ -184,7 +197,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         User user = new User(0,0);
                         databaseRef.child("users/" + getCurrentUserUid()).setValue(user.toMap());
 
-                        loadFirebaseData();
+                        initUserStatusView();
                     } else {
                         // If sign in fails, display a message to the user.
                         showSnackbar(findViewById(R.id.activity_main_layout), "Sign in failed");
@@ -193,7 +206,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             });
     }
 
-    public void loadFirebaseData() {
+    /**
+     * A helper method to initialize the user status view from Firebase
+     */
+    public void initUserStatusView() {
+        // a query for this specific user
         Query userQuery = databaseRef.child("users/"+getCurrentUserUid());
 
         userQuery.addValueEventListener(new ValueEventListener() {
@@ -201,6 +218,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
 
+                // update textviews based on user data
                 oweTextView.setText(convertLongToStringCurrency(user.owe));
                 isOwedTextView.setText(convertLongToStringCurrency(user.isOwed));
                 if (user.isOwed > user.owe) {
@@ -219,10 +237,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
-
-        initRoomsRecyclerView();
     }
 
+    /**
+     * A helper method to initialize the room recycler view
+     *
+     * Reference: https://github.com/firebase/quickstart-android
+     */
     public void initRoomsRecyclerView() {
         // Set up FirebaseRecyclerAdapter with the Query
         Query joinedRoomsQuery = getJoinedRoomsQuery();
@@ -248,7 +269,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         intent.putExtra("roomUid", roomUid);
                         intent.putExtra("roomTitle", model.title);
 
-                        startActivityForResult(intent, ENTER_ROOM_REQ);
+                        startActivity(intent);
                     }
                 });
 
@@ -265,6 +286,25 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
         };
         roomsRecyclerView.setAdapter(recyclerAdapter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_main_about) {
+            // go to about app activity
+            Intent intent = new Intent(this, AboutAppActivity.class);
+            startActivity(intent);
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -398,6 +438,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         bottomSheetDialog.hide();
     }
 
+    /**
+     * A helper method to get the query for rooms that this user has joined
+     *
+     * @return A query
+     */
     public Query getJoinedRoomsQuery() {
         Query joinedRoomsQuery = databaseRef.child("rooms").orderByChild("members/"+getCurrentUserUid())
                 .limitToLast(100);
@@ -407,6 +452,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 hideProgressDialog();
 
+                // check if user has joined any rooms
                 boolean joinedAny = false;
 
                 for (DataSnapshot roomDataSnapshot : dataSnapshot.getChildren()) {
@@ -417,9 +463,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 }
 
                 if (!joinedAny) {
+                    // if user has not joined any room, show the emptyMessage
                     roomsRecyclerView.setVisibility(View.GONE);
                     emptyMessageLinearLayout.setVisibility(View.VISIBLE);
                 } else {
+                    // if user has joined any room, show the room recycler view
                     roomsRecyclerView.setVisibility(View.VISIBLE);
                     emptyMessageLinearLayout.setVisibility(View.GONE);
 
@@ -437,6 +485,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         return joinedRoomsQuery;
     }
 
+    /**
+     * A helper method to determine the sections (month-year section) in the room recycler view
+     * Reference: http://codetheory.in/android-dividing-listview-sections-group-headers/
+     *
+     * @param dataSnapshot
+     */
     public void determineSections(DataSnapshot dataSnapshot) {
         // clear the section-roomUid map
         sectionStartsAtRoomUid.clear();

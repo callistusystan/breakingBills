@@ -1,7 +1,5 @@
 package edu.monash.fit3027.breakingbills;
 
-import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -10,9 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
-import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,7 +21,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import edu.monash.fit3027.breakingbills.fragments.PaymentFragment;
@@ -36,6 +30,16 @@ import edu.monash.fit3027.breakingbills.models.Member;
 import edu.monash.fit3027.breakingbills.models.Room;
 
 import static java.lang.Math.abs;
+
+/**
+ * The room activity screen the user is brought to after tapping a room
+ * in the main activity screen.
+ *
+ * Reference:
+ *  1. https://github.com/firebase/quickstart-android for logic regarding tab layouts and viewPager fragments
+ *
+ * Created by Callistus on 29/4/2017.
+ */
 
 public class RoomActivity extends BaseActivity implements View.OnClickListener {
 
@@ -112,6 +116,9 @@ public class RoomActivity extends BaseActivity implements View.OnClickListener {
         super.onStart();
     }
 
+    /**
+     * A helper method to initialize the views on this activity
+     */
     public void initViews() {
         roomStatusSection = (LinearLayout) findViewById(R.id.activity_room_roomStatusLinearLayout);
         roomStatusSection.setOnClickListener(this);
@@ -165,6 +172,10 @@ public class RoomActivity extends BaseActivity implements View.OnClickListener {
         tabLayout.setupWithViewPager(viewPager);
     }
 
+    /**
+     * A helper method to initialize the expanded section that shows the room's total and
+     * amount that has been unaccounted for
+     */
     public void initExpandedSection() {
         DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
         Query roomQuery = databaseRef.child("rooms/"+roomUid);
@@ -200,6 +211,7 @@ public class RoomActivity extends BaseActivity implements View.OnClickListener {
         });
     }
 
+    // getter methods to get room metadata
     public String getRoomUid() {
         return roomUid;
     }
@@ -211,88 +223,14 @@ public class RoomActivity extends BaseActivity implements View.OnClickListener {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_room, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == android.R.id.home) {
+            // if user clicked on the back button, call finish lifecycler method
             finish();
-            return true;
-        } else
-        if (itemId == R.id.menu_room_leave) {
-            leaveRoom();
             return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
-    }
-
-    public void leaveRoom() {
-        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        final DatabaseReference roomRef = databaseRef.child("rooms/" + getRoomUid());
-
-        final Activity instance = this;
-        ValueEventListener membersListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                final Room room = dataSnapshot.getValue(Room.class);
-                // check member status to see if should show a warning
-                String status = (String)room.memberDetail.get(getCurrentUserUid()).get("status");
-                if (status != Member.PAYMENT_SETTLED) {
-                    // init the alert dialog builder
-                    AlertDialog.Builder builder = new AlertDialog.Builder(instance);
-
-                    // set the layout for the alert dialog
-                    LayoutInflater inflater = getLayoutInflater();
-                    final View dialogView = inflater.inflate(R.layout.message_dialog, null);
-                    // init text views
-                    TextView normal_dialog_title = (TextView) dialogView.findViewById(R.id.message_dialog_title);
-                    TextView normal_dialog_message = (TextView) dialogView.findViewById(R.id.message_dialog_message);
-
-                    normal_dialog_title.setText("Leave room?");
-                    normal_dialog_message.setText("It seems that payment has not been settled yet! Are you sure you want to leave?");
-
-                    // set the positive and negative buttons' onclicks
-                    builder.setView(dialogView)
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    int memberSize = room.members.size();
-
-                                    if (memberSize == 1) {
-                                        roomRef.setValue(null);
-                                    } else {
-                                        Map<String, Object> childUpdates = new HashMap<>();
-                                        childUpdates.put("members/" + getCurrentUserUid(), null);
-                                        childUpdates.put("memberDetail/" + getCurrentUserUid(), null);
-
-                                        roomRef.updateChildren(childUpdates);
-                                    }
-
-                                    setResult(RESULT_OK);
-                                    finish();
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            });
-
-                    // create and show this dialog
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        };
-        roomRef.addListenerForSingleValueEvent(membersListener);
     }
 }

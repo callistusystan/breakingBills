@@ -1,9 +1,5 @@
 package edu.monash.fit3027.breakingbills.fragments;
 
-/**
- * Created by Callistus on 30/4/2017.
- */
-
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -42,6 +38,17 @@ import edu.monash.fit3027.breakingbills.viewholders.ReceiptViewHolder;
 
 import static android.app.Activity.RESULT_OK;
 
+/**
+ * A fragment class to show all receipt images in a room. Also allows users in the room to capture
+ * and upload images of receipts to Firebase storage
+ *
+ * Reference:
+ *  1. https://github.com/firebase/quickstart-android for the Firebase recycler view
+ *  2. https://firebase.google.com/docs/storage/android/upload-files for uploading images to Firebase storage
+ *
+ * Created by Callistus on 30/4/2017.
+ */
+
 public class ReceiptFragment extends RoomFragment implements View.OnClickListener {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -75,7 +82,6 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
         storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://breaking-bills.appspot.com");
 
         // link views
-
         cameraButton = (FloatingActionButton) rootView.findViewById(R.id.fragment_receipt_cameraButton);
         cameraButton.setOnClickListener(this);
 
@@ -93,13 +99,10 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
     }
 
     public void initViews() {
-        // Set up Layout Manager, reverse layout so it shows most recent at the top
         receiptsRecyclerViewManager = new GridLayoutManager(getActivity(), 2);
 
         // Setup GridView to display captured images
-        // You could use RecyclerView alternatively (much better performance)
         receiptsRecylerView = (RecyclerView) getRoomActivity().findViewById(R.id.fragment_receipt_receiptsRecyclerView);
-//        receiptsRecylerView.addItemDecoration(new GridSpacingItemDecoration(2, 4, true, 0));
 
         receiptsRecylerView.setHasFixedSize(true);
         receiptsRecylerView.setLayoutManager(receiptsRecyclerViewManager);
@@ -108,6 +111,9 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
         emptyMessageLinearLayout = (LinearLayout) getRoomActivity().findViewById(R.id.fragment_receipt_emptyView);
     }
 
+    /**
+     * A helper method to initialize the recycler view to visually show all receipts in the room
+     */
     public void initReceiptsRecyclerView() {
         // Set up FirebaseRecyclerAdapter with the Query
         Query roomReceiptsQuery = getRoomReceiptsQuery();
@@ -144,6 +150,10 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
         receiptsRecylerView.setAdapter(recyclerAdapter);
     }
 
+    /**
+     * A helper method to get the query for returning the receipts in the current room
+     * @return a query for all receipts in the room
+     */
     public Query getRoomReceiptsQuery() {
         Query roomReceiptsQuery = databaseRef.child("rooms/"+getRoomActivity().getRoomUid()+"/receipts");
 
@@ -152,18 +162,23 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
         roomReceiptsQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                // clear old list as we are going to repopulate it
                 photoUids.clear();
 
-                // iterate through every receipt
+                // iterate through every receipt, and add to list
                 for (DataSnapshot receiptDataSnapshot : dataSnapshot.getChildren()) {
                     photoUids.add(receiptDataSnapshot.getKey());
                 }
 
+                // hide progress dialog as we are done
                 instance.getRoomActivity().hideProgressDialog();
+
                 if (dataSnapshot.getValue() == null) {
+                    // if no images, show an empty message
                     receiptsRecylerView.setVisibility(View.GONE);
                     emptyMessageLinearLayout.setVisibility(View.VISIBLE);
                 } else {
+                    // if there are images, show the recycler view
                     receiptsRecylerView.setVisibility(View.VISIBLE);
                     emptyMessageLinearLayout.setVisibility(View.GONE);
                 }
@@ -186,6 +201,9 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
         }
     }
 
+    /**
+     * A helper method to start an intent to capture a photo
+     */
     public void capturePhoto() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getRoomActivity().getPackageManager()) != null) {
@@ -196,6 +214,8 @@ public class ReceiptFragment extends RoomFragment implements View.OnClickListene
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            // on successful return from capturing a photo, upload image to firebase database and storage
+
             // get bitmap that was taken
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");

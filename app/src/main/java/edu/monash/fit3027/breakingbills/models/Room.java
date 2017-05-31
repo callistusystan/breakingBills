@@ -8,6 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Room class for representing a room stored in the database
+ *
+ * Reference:
+ *  1. https://github.com/firebase/quickstart-android Firebase class models
+ *
  * Created by Callistus on 27/4/2017.
  */
 

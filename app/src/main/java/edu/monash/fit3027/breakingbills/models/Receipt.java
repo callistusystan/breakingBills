@@ -8,6 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Receipt class for representing a receipt in a room
+ *
+ * Reference:
+ *  1. https://github.com/firebase/quickstart-android Firebase class models
+ *
  * Created by Callistus on 3/5/2017.
  */
 @IgnoreExtraProperties

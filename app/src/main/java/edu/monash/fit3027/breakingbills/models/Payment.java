@@ -8,6 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Payment class used to represent payments made in a room
+ *
+ * Reference:
+ *  1. https://github.com/firebase/quickstart-android Firebase class models
+ *
  * Created by Callistus on 27/4/2017.
  */
 

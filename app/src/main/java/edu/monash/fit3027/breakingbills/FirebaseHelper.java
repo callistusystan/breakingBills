@@ -18,6 +18,11 @@ import edu.monash.fit3027.breakingbills.models.User;
 import static java.lang.Math.max;
 
 /**
+ * A class that contains methods implementing logic to interact with the Firebase database.
+ * To ensure only one instance exists, I used the Singleton pattern.
+ *
+ * Reference: https://en.wikipedia.org/wiki/Singleton_pattern
+ *
  * Created by Callistus on 18/5/2017.
  */
 
@@ -34,7 +39,7 @@ public class FirebaseHelper {
         databaseRef = FirebaseDatabase.getInstance().getReference();
         auth = FirebaseAuth.getInstance();
 
-        // users
+        // listen to users in the database
         databaseRef.child("users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -52,7 +57,7 @@ public class FirebaseHelper {
             }
         });
 
-        // rooms
+        // listen to rooms in the database
         databaseRef.child("rooms").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -92,6 +97,13 @@ public class FirebaseHelper {
         return instance;
     }
 
+    /**
+     * A helper method to set the cost of a user in a room on Firebase.
+     *
+     * @param roomUid
+     * @param userUid
+     * @param newCost
+     */
     public void setCost(String roomUid, String userUid, long newCost) {
         Member memberDetail = new Member(rooms.get(roomUid).memberDetail.get(userUid));
 
@@ -117,6 +129,13 @@ public class FirebaseHelper {
         databaseRef.updateChildren(childUpdates);
     }
 
+    /**
+     * A helper method to set the payment in a room on Firebase
+     *
+     * @param roomUid
+     * @param paymentUid
+     * @param newPaymentAmount
+     */
     public void setPayment(String roomUid, String paymentUid, long newPaymentAmount) {
         Room room = rooms.get(roomUid);
         Payment payment = new Payment(room.payments.get(paymentUid));
@@ -124,6 +143,16 @@ public class FirebaseHelper {
         setPayment(roomUid, paymentUid, payment.payerUid, payment.payeeUid, newPaymentAmount, true);
     }
 
+    /**
+     * A helper method to set the payment in a room on Firebase
+     *
+     * @param roomUid
+     * @param paymentUid
+     * @param payerUid
+     * @param payeeUid
+     * @param newPaymentAmount
+     * @param wantChange
+     */
     public void setPayment(String roomUid, String paymentUid, String payerUid, String payeeUid, long newPaymentAmount, boolean wantChange) {
         Room room = rooms.get(roomUid);
         Payment payment;
@@ -148,11 +177,27 @@ public class FirebaseHelper {
         databaseRef.updateChildren(childUpdates);
     }
 
+    /**
+     * A helper method to make a payment in a room on Firebase
+     *
+     * @param roomUid
+     * @param payerUid
+     * @param payeeUid
+     * @param amount
+     * @param wantChange
+     */
     public void makePayment(String roomUid, String payerUid, String payeeUid, long amount, boolean wantChange) {
         String paymentUid = databaseRef.child("rooms/"+roomUid+"/payments").push().getKey();
         setPayment(roomUid, paymentUid, payerUid, payeeUid, amount, wantChange);
     }
 
+    /**
+     * A helper method to process a payment that has been created in a room on Firebase
+     *
+     * @param roomUid
+     * @param paymentUid
+     * @param isConfirmed
+     */
     public void processPayment(String roomUid, String paymentUid, Boolean isConfirmed) {
         Room room = rooms.get(roomUid);
 
@@ -211,7 +256,7 @@ public class FirebaseHelper {
                 long owedAmount = payerPaidAmount - payerOwedAmount;
 
                 // update payeeUser's owe
-                payeeUser.owe = payerUser.owe + owedAmount;
+                payeeUser.owe = payeeUser.owe + owedAmount;
 
                 // update payerUser's isOwed
                 payerUser.isOwed = payerUser.isOwed + owedAmount;

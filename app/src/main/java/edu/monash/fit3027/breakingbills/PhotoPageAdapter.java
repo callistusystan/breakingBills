@@ -1,7 +1,10 @@
 package edu.monash.fit3027.breakingbills;
 
 /**
- * Created by Callistus on 5/5/2017.
+ * An adapter to contain fragments with each photo in a fullscreen image view
+ *
+ * Reference:
+ *  1. CameraDemo by Josh Olsen, provided in Moodle for setup of fragment page adapter to be used for images
  */
 
 import java.util.List;

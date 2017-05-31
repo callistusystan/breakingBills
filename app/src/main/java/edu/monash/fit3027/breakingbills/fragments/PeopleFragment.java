@@ -1,6 +1,13 @@
 package edu.monash.fit3027.breakingbills.fragments;
 
 /**
+ * A fragment class to show all members in a room. Allows hosts to interact with non-hosts, and
+ * vice-versa, to facilitate the setting of costs and making of payments.
+ *
+ * Reference:
+ *  1. https://github.com/firebase/quickstart-android for the Firebase recycler view
+ *  2. https://developer.android.com/guide/topics/ui/dialogs.html for alert dialogs
+ *
  * Created by Callistus on 30/4/2017.
  */
 
@@ -18,7 +25,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.bumptech.glide.util.Util;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,7 +43,7 @@ import edu.monash.fit3027.breakingbills.viewholders.MemberViewHolder;
 
 import static edu.monash.fit3027.breakingbills.Utils.convertStringToLongCurrency;
 
-public class PeopleFragment extends RoomFragment implements View.OnClickListener {
+public class PeopleFragment extends RoomFragment {
 
     // firebase components
     private DatabaseReference databaseRef;
@@ -45,9 +51,6 @@ public class PeopleFragment extends RoomFragment implements View.OnClickListener
     // recycler view
     private RecyclerView membersRecyclerView;
     private LinearLayoutManager mManager;
-
-    // button
-    private FloatingActionButton addButton;
 
     public PeopleFragment() {}
 
@@ -67,9 +70,6 @@ public class PeopleFragment extends RoomFragment implements View.OnClickListener
         membersRecyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_all_people_recyclerView);
         membersRecyclerView.setHasFixedSize(true);
 
-        addButton = (FloatingActionButton) rootView.findViewById(R.id.fragment_all_people_addButton);
-        addButton.setOnClickListener(this);
-
         return rootView;
     }
 
@@ -81,6 +81,9 @@ public class PeopleFragment extends RoomFragment implements View.OnClickListener
         initViews();
     }
 
+    /**
+     * Initialize the views in this fragment.
+     */
     public void initViews() {
         // Set up Layout Manager, reverse layout
         mManager = new LinearLayoutManager(getActivity());
@@ -89,15 +92,27 @@ public class PeopleFragment extends RoomFragment implements View.OnClickListener
         initMembersRecyclerView();
     }
 
+    /**
+     * A helper method to determine if a user is the room's host
+     * @param memberUid
+     * @return true if memberUid is the room's host, false otherwise
+     */
     public boolean isHost(String memberUid) {
         String hostUid = getRoomActivity().getRoomHostUid();
         return memberUid.equals(hostUid);
     }
 
+    /**
+     * Method overloading, allowing no arguments to indicate a call with current userUid
+     * @return true if memberUid is the room's host, false otherwise
+     */
     public boolean isHost() {
         return isHost(getCurrentUserUid());
     }
 
+    /**
+     * A helper method to initialize recycler view to visually show all the members in the room
+     */
     public void initMembersRecyclerView() {
         // show progress dialog
         getRoomActivity().showProgressDialog();
@@ -238,17 +253,31 @@ public class PeopleFragment extends RoomFragment implements View.OnClickListener
         membersRecyclerView.setAdapter(recyclerAdapter);
     }
 
+    /**
+     * A helper method to allow a user to set his/her own cost
+     * @param newCostString
+     */
     public void setAmount(String newCostString) {
         final long newCost = convertStringToLongCurrency(newCostString);
 
         FirebaseHelper.getInstance().setCost(getRoomUid(), getCurrentUserUid(), newCost);
     }
 
+    /**
+     * A helper method to make a payment to another user
+     * @param payeeUid
+     * @param newPaymentString
+     * @param wantChange
+     */
     public void makePayment(String payeeUid, String newPaymentString, boolean wantChange) {
         final long newPayment = Utils.convertStringToLongCurrency(newPaymentString);
         FirebaseHelper.getInstance().makePayment(getRoomUid(), getCurrentUserUid(), payeeUid, newPayment, wantChange);
     }
 
+    /**
+     * A helper method to get the query for all members in the room
+     * @return a query for all members in the room
+     */
     public Query getMembersQuery() {
         Query membersQuery = databaseRef.child("rooms/"+getRoomUid()+"/memberDetail").orderByChild("timestamp");
 
@@ -266,13 +295,5 @@ public class PeopleFragment extends RoomFragment implements View.OnClickListener
         });
 
         return membersQuery;
-    }
-
-    @Override
-    public void onClick(View view) {
-        int viewId = view.getId();
-        if (viewId == R.id.fragment_all_people_addButton) {
-            System.out.println("Maybe add someone?");
-        }
     }
 }
