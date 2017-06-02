@@ -9,13 +9,15 @@ This project was made with Firebase, Firebase UI, Volley, Glide and Human-Readab
 Made for FIT3027: Android and iOS development at Monash University.
 
 ## Screenshots
-<img src="/screenshots/screenshot1.png">
-<img src="/screenshots/screenshot2.png">
-<img src="/screenshots/screenshot3.png">
-<img src="/screenshots/screenshot4.png">
-<img src="/screenshots/screenshot5.png">
-<img src="/screenshots/screenshot6.png">
-<img src="/screenshots/screenshot7.png">
+<div>
+  <img src="/screenshots/screenshot1.png" width="240">
+  <img src="/screenshots/screenshot2.png" width="240">
+  <img src="/screenshots/screenshot3.png" width="240">
+  <img src="/screenshots/screenshot4.png" width="240">
+  <img src="/screenshots/screenshot5.png" width="240">
+  <img src="/screenshots/screenshot6.png" width="240">
+  <img src="/screenshots/screenshot7.png" width="240">
+</div>
 
 ## Usage ##
 
