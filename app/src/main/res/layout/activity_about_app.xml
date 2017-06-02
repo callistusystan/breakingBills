@@ -7,4 +7,42 @@
     android:orientation="vertical"
     tools:context="edu.monash.fit3027.breakingbills.AboutAppActivity">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:textAlignment="center"
+        android:background="@drawable/border2"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:text="About this app" />
+
+    <TextView
+        android:id="@+id/activity_about_app_appInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:textSize="14sp"
+        android:background="#FFF"
+        android:text="This app serves as a tool to facilitate the splitting of bills." />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:background="@drawable/border2"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:text="Libraries used" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/activity_about_app_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/border"
+        android:clipToPadding="false"
+        android:layout_gravity="end|bottom"
+        android:scrollbars="vertical" />
+
 </LinearLayout>

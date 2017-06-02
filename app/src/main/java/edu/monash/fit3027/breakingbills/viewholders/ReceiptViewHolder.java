@@ -21,7 +21,8 @@ import edu.monash.fit3027.breakingbills.R;
  * A list view holder to load and display a receipt image using Glide
  *
  * References:
- *  1. https://github.com/firebase/quickstart-android for the idea of view holders
+ *  1. https://github.com/firebase/quickstart-android for learning how to implement
+ *      view holders for firebase recycler views
  *  2. https://github.com/bumptech/glide for Glide related code
  *
  * Created by Callistus on 3/5/2017.

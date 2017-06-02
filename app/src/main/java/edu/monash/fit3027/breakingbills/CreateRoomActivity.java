@@ -32,6 +32,8 @@ import edu.monash.fit3027.breakingbills.models.Room;
  *
  * Reference:
  *  1. https://developer.android.com/training/volley/index.html for code to perform a HTTP GET request
+ *  2. https://github.com/coolaj86/human-readable-ids-js which was used in my google cloud function to
+ *      generate a readable ID
  *
  * Created by Callistus on 29/4/2017.
  */
@@ -80,7 +82,9 @@ public class CreateRoomActivity extends BaseActivity implements View.OnClickList
      * Gets a unique readable roomUid using Volley to call my Firebase cloud function.
      * Upon success, gets the roomUid and creates and joins the room in the firebase database
      *
-     * Reference: https://developer.android.com/training/volley/index.html
+     * Reference:
+     *  1. https://developer.android.com/training/volley/index.html
+     *  2. https://github.com/coolaj86/human-readable-ids-js
      */
     private void writeNewRoom() {
         showProgressDialog("Creating room");

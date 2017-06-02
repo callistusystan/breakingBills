@@ -30,7 +30,8 @@ import edu.monash.fit3027.breakingbills.models.Room;
  * A list view holder to visually show payment information
  *
  * Reference:
- *  1. https://github.com/firebase/quickstart-android for the idea of view holders
+ *  1. https://github.com/firebase/quickstart-android for learning how to implement
+ *      view holders for firebase recycler views
  *
  * Created by Callistus on 28/4/2017.
  */

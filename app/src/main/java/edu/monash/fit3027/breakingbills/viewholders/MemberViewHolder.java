@@ -15,7 +15,8 @@ import edu.monash.fit3027.breakingbills.models.Member;
  * A list view holder to visually show member information in a room
  *
  * Reference:
- *  1. https://github.com/firebase/quickstart-android for the idea of view holders
+ *  1. https://github.com/firebase/quickstart-android for learning how to implement
+ *      view holders for firebase recycler views
  *
  * Created by Callistus on 29/4/2017.
  */
