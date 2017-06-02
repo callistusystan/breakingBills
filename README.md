@@ -16,7 +16,6 @@ Made for FIT3027: Android and iOS development at Monash University.
   <img src="/screenshots/screenshot4.png" width="240">
   <img src="/screenshots/screenshot5.png" width="240">
   <img src="/screenshots/screenshot6.png" width="240">
-  <img src="/screenshots/screenshot7.png" width="240">
 </div>
 
 ## Usage ##
