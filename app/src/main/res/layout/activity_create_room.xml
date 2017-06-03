@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="edu.monash.fit3027.breakingbills.CreateRoomActivity">
+    tools:context="edu.monash.fit3027.breakingbills.activities.CreateRoomActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

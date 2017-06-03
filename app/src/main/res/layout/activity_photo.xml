@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000"
-    tools:context="edu.monash.fit3027.breakingbills.PhotoActivity">
+    tools:context="edu.monash.fit3027.breakingbills.activities.PhotoActivity">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/activity_photo_viewPager"

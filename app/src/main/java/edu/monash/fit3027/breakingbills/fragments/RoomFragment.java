@@ -2,7 +2,7 @@ package edu.monash.fit3027.breakingbills.fragments;
 
 import android.support.v4.app.Fragment;
 
-import edu.monash.fit3027.breakingbills.RoomActivity;
+import edu.monash.fit3027.breakingbills.activities.RoomActivity;
 import edu.monash.fit3027.breakingbills.models.Room;
 
 /**

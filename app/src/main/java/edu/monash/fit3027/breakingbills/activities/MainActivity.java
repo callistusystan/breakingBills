@@ -1,4 +1,4 @@
-package edu.monash.fit3027.breakingbills;
+package edu.monash.fit3027.breakingbills.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -34,6 +34,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.monash.fit3027.breakingbills.FirebaseHelper;
+import edu.monash.fit3027.breakingbills.R;
 import edu.monash.fit3027.breakingbills.models.Member;
 import edu.monash.fit3027.breakingbills.models.Room;
 import edu.monash.fit3027.breakingbills.models.User;

@@ -1,4 +1,4 @@
-package edu.monash.fit3027.breakingbills;
+package edu.monash.fit3027.breakingbills.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -12,6 +12,8 @@ import android.view.View;
 
 import java.util.ArrayList;
 
+import edu.monash.fit3027.breakingbills.PhotoPageAdapter;
+import edu.monash.fit3027.breakingbills.R;
 import edu.monash.fit3027.breakingbills.fragments.FullScreenReceiptFragment;
 
 /**

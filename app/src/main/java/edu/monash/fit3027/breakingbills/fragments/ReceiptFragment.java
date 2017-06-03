@@ -30,9 +30,9 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
-import edu.monash.fit3027.breakingbills.PhotoActivity;
+import edu.monash.fit3027.breakingbills.activities.PhotoActivity;
 import edu.monash.fit3027.breakingbills.R;
-import edu.monash.fit3027.breakingbills.RoomActivity;
+import edu.monash.fit3027.breakingbills.activities.RoomActivity;
 import edu.monash.fit3027.breakingbills.models.Receipt;
 import edu.monash.fit3027.breakingbills.viewholders.ReceiptViewHolder;
 

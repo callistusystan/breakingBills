@@ -1,4 +1,4 @@
-package edu.monash.fit3027.breakingbills;
+package edu.monash.fit3027.breakingbills.activities;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -23,6 +23,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Map;
 
+import edu.monash.fit3027.breakingbills.FirebaseHelper;
+import edu.monash.fit3027.breakingbills.R;
+import edu.monash.fit3027.breakingbills.Utils;
+import edu.monash.fit3027.breakingbills.activities.BaseActivity;
 import edu.monash.fit3027.breakingbills.fragments.PaymentFragment;
 import edu.monash.fit3027.breakingbills.fragments.PeopleFragment;
 import edu.monash.fit3027.breakingbills.fragments.ReceiptFragment;

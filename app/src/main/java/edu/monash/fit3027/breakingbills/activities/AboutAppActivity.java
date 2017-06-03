@@ -1,4 +1,4 @@
-package edu.monash.fit3027.breakingbills;
+package edu.monash.fit3027.breakingbills.activities;
 
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,6 +8,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import edu.monash.fit3027.breakingbills.LibraryAdapter;
+import edu.monash.fit3027.breakingbills.LicenseNotices;
+import edu.monash.fit3027.breakingbills.R;
 import edu.monash.fit3027.breakingbills.models.Library;
 
 /**

@@ -27,7 +27,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import edu.monash.fit3027.breakingbills.R;
-import edu.monash.fit3027.breakingbills.RoomActivity;
+import edu.monash.fit3027.breakingbills.activities.RoomActivity;
 import edu.monash.fit3027.breakingbills.models.Payment;
 import edu.monash.fit3027.breakingbills.viewholders.PaymentViewHolder;
 

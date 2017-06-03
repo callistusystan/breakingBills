@@ -13,7 +13,6 @@ package edu.monash.fit3027.breakingbills.fragments;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,7 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import edu.monash.fit3027.breakingbills.FirebaseHelper;
 import edu.monash.fit3027.breakingbills.R;
-import edu.monash.fit3027.breakingbills.RoomActivity;
+import edu.monash.fit3027.breakingbills.activities.RoomActivity;
 import edu.monash.fit3027.breakingbills.Utils;
 import edu.monash.fit3027.breakingbills.models.Member;
 import edu.monash.fit3027.breakingbills.models.Room;

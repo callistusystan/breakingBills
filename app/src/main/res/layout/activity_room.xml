@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5"
-    tools:context="edu.monash.fit3027.breakingbills.RoomActivity">
+    tools:context="edu.monash.fit3027.breakingbills.activities.RoomActivity">
 
     <android.support.design.widget.TabLayout
         android:id="@+id/activity_room_tabs"

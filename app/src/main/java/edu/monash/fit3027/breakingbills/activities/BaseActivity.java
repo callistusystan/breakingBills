@@ -1,4 +1,4 @@
-package edu.monash.fit3027.breakingbills;
+package edu.monash.fit3027.breakingbills.activities;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+
+import edu.monash.fit3027.breakingbills.R;
 
 import static android.support.design.widget.Snackbar.LENGTH_SHORT;
 

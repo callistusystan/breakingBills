@@ -1,4 +1,4 @@
-package edu.monash.fit3027.breakingbills;
+package edu.monash.fit3027.breakingbills.activities;
 
 import android.support.design.widget.FloatingActionButton;
 import android.os.Bundle;
@@ -23,6 +23,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.monash.fit3027.breakingbills.R;
+import edu.monash.fit3027.breakingbills.Utils;
 import edu.monash.fit3027.breakingbills.models.Member;
 import edu.monash.fit3027.breakingbills.models.Room;
 

@@ -17,22 +17,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BaseActivity" />
-        <activity android:name=".CreateRoomActivity" />
-        <activity android:name=".RoomActivity" />
+        <activity android:name=".activities.BaseActivity" />
+        <activity android:name=".activities.CreateRoomActivity" />
+        <activity android:name=".activities.RoomActivity" />
         <activity
-            android:name=".PhotoActivity"
+            android:name=".activities.PhotoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_photo"
             android:theme="@style/FullscreenTheme" />
-        <activity android:name=".AboutAppActivity"></activity>
+        <activity android:name=".activities.AboutAppActivity"></activity>
     </application>
 
 </manifest>
