@@ -200,6 +200,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         databaseRef.child("users/" + getCurrentUserUid()).setValue(user.toMap());
 
                         initUserStatusView();
+                        // user has not joined any room, show the emptyMessage
+                        roomsRecyclerView.setVisibility(View.GONE);
+                        emptyMessageLinearLayout.setVisibility(View.VISIBLE);
                     } else {
                         // If sign in fails, display a message to the user.
                         showSnackbar(findViewById(R.id.activity_main_layout), "Sign in failed");

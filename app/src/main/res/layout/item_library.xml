@@ -60,6 +60,7 @@ Licensed under BSD, part MIT and Apache 2.0"
             <ImageView
                 android:id="@+id/item_library_arrow"
                 android:src="@drawable/ic_down"
+                android:layout_marginRight="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical" />
