@@ -9,7 +9,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import edu.monash.fit3027.breakingbills.LibraryAdapter;
-import edu.monash.fit3027.breakingbills.LicenseNotices;
+import edu.monash.fit3027.breakingbills.LicenseInfo;
 import edu.monash.fit3027.breakingbills.R;
 import edu.monash.fit3027.breakingbills.models.Library;
 
@@ -52,7 +52,7 @@ public class AboutAppActivity extends BaseActivity {
         appInfoTextView = (TextView) findViewById(R.id.activity_about_app_appInfo);
 
         appInfoTextView.setText(
-                "Breaking Bills serves as a tool that facilitates the splitting of bills."
+                "Breaking Bills is an app built by Callistus Tan, that aims to facilitate the splitting of bills."
                 + "\n\nUsing real-time connectivity, users may connect "
                 + "to rooms in real time and collaborate to settle payments. "
                 + "In Breaking Bills, receipts are readily available to all users, while "
@@ -74,10 +74,10 @@ public class AboutAppActivity extends BaseActivity {
 
         // instantiate and put libraries in an arraylist
         ArrayList<Library> libraries = new ArrayList<>();
-        libraries.add(new Library("Firebase UI", R.mipmap.ic_firebase, LicenseNotices.firebaseUI));
-        libraries.add(new Library("Volley", R.mipmap.ic_volley, LicenseNotices.volley));
-        libraries.add(new Library("Glide", R.mipmap.ic_glide, LicenseNotices.glide));
-        libraries.add(new Library("Human-Readable-Ids-JS", R.mipmap.ic_nodejs, LicenseNotices.humanReadableIds));
+        libraries.add(new Library("Firebase/Firebase UI", R.mipmap.ic_firebase, LicenseInfo.firebaseDetail, LicenseInfo.firebaseLicense));
+        libraries.add(new Library("Volley", R.mipmap.ic_volley, LicenseInfo.volleyDetail, LicenseInfo.volleyLicense));
+        libraries.add(new Library("Glide", R.mipmap.ic_glide, LicenseInfo.glideDetail, LicenseInfo.glideLicense));
+        libraries.add(new Library("Human-Readable-Ids-JS", R.mipmap.ic_nodejs, LicenseInfo.humanReadableIdsDetail, LicenseInfo.humanReadableIdsLicense));
 
         // create the adapter, and take note of libraries
         LibraryAdapter adapter = new LibraryAdapter(libraries);

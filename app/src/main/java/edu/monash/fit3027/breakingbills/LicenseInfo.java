@@ -13,9 +13,14 @@ package edu.monash.fit3027.breakingbills;
  * Created by Callistus on 1/6/2017.
  */
 
-public class LicenseNotices {
+public class LicenseInfo {
 
-    public static String firebaseUI =
+    public static String firebaseDetail = "Copyright of Google\nLicensed under Apache 2.0";
+    public static String volleyDetail = "Copyright of Google\nLicensed under Apache 2.0";
+    public static String glideDetail = "Copyright of Bumptech\nLicensed under BSD, part MIT and Apache 2.0";
+    public static String humanReadableIdsDetail = "Copyright of AJ ONeal\nLicensed under Apache 2.0";
+
+    public static String firebaseLicense =
             "                                 Apache License\n" +
             "                           Version 2.0, January 2004\n" +
             "                        http://www.apache.org/licenses/\n" +
@@ -218,7 +223,7 @@ public class LicenseNotices {
             "   See the License for the specific language governing permissions and\n" +
             "   limitations under the License.";
 
-    public static String volley =
+    public static String volleyLicense =
             "                                 Apache License\n" +
             "                           Version 2.0, January 2004\n" +
             "                        http://www.apache.org/licenses/\n" +
@@ -421,7 +426,7 @@ public class LicenseNotices {
             "   See the License for the specific language governing permissions and\n" +
             "   limitations under the License.";
 
-    public static String glide =
+    public static String glideLicense =
             "License for everything not in third_party and not otherwise marked:\n" +
             "\n" +
             "Copyright 2014 Google, Inc. All rights reserved.\n" +
@@ -517,7 +522,7 @@ public class LicenseNotices {
             "receive copies from any such party to do so, with the only requirement being\n" +
             "that this copyright notice remain intact.";
 
-    public static String humanReadableIds =
+    public static String humanReadableIdsLicense =
             "                                 Apache License\n" +
             "                           Version 2.0, January 2004\n" +
             "                        http://www.apache.org/licenses/\n" +

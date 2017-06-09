@@ -29,6 +29,7 @@ public class LibraryViewHolder extends RecyclerView.ViewHolder implements View.O
 
     // text views
     TextView nameTextView;
+    TextView detailTextView;
     TextView licenseTextView;
 
     // the model of this view holder
@@ -47,6 +48,7 @@ public class LibraryViewHolder extends RecyclerView.ViewHolder implements View.O
         arrow = (ImageView) itemView.findViewById(R.id.item_library_arrow);
 
         nameTextView = (TextView) itemView.findViewById(R.id.item_library_name);
+        detailTextView = (TextView) itemView.findViewById(R.id.item_library_detail);
         licenseTextView = (TextView) itemView.findViewById(R.id.item_library_licenseNotice);
 
         // hide the license view
@@ -68,6 +70,7 @@ public class LibraryViewHolder extends RecyclerView.ViewHolder implements View.O
 
         // set the text views
         nameTextView.setText(library.getName());
+        detailTextView.setText(library.getDetail());
         licenseTextView.setText(library.getLicense());
 
         // set an onclick listener that shows/hide the license notice

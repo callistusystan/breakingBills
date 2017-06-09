@@ -9,12 +9,14 @@ package edu.monash.fit3027.breakingbills.models;
 public class Library {
 
     private String name;
+    private String detail;
     private String license;
     private int icon;
 
-    public Library(String name, int icon, String license) {
+    public Library(String name, int icon, String detail, String license) {
         this.name = name;
         this.icon = icon;
+        this.detail = detail;
         this.license = license;
     }
 
@@ -24,6 +26,10 @@ public class Library {
     }
 
     public int getIcon() { return icon; }
+
+    public String getDetail() {
+        return detail;
+    }
 
     public String getLicense() {
         return license;

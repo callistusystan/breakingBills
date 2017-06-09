@@ -29,13 +29,28 @@
             android:layout_gravity="center_vertical"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/item_library_name"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Firebase UI"
-                android:textColor="#000"
-                android:textSize="18sp" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/item_library_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Firebase UI"
+                    android:textColor="#000"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/item_library_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Copyright of Bumptech
+Licensed under BSD, part MIT and Apache 2.0"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
 
             <View
                 android:layout_width="0dp"
@@ -45,10 +60,9 @@
             <ImageView
                 android:id="@+id/item_library_arrow"
                 android:src="@drawable/ic_down"
-                android:layout_marginTop="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:gravity="center" />
+                android:gravity="center_vertical" />
 
         </LinearLayout>
     </LinearLayout>
